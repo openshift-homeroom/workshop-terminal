@@ -1,0 +1,92 @@
+#!/bin/bash
+
+set -x
+
+# Add entry to /etc/passwd file.
+
+whoami &> /dev/null || STATUS=$? && true
+
+if [[ "$STATUS" != "0" ]]; then
+    cat /etc/passwd | sed -e "s/^default:/builder:/" > /tmp/passwd
+    echo "default:x:$(id -u):$(id -g):,,,:/opt/app-root/src:/bin/bash" >> /tmp/passwd
+    cat /tmp/passwd > /etc/passwd
+    rm /tmp/passwd
+fi
+
+# Setup 'oc' client configuration for the location of the OpenShift cluster.
+
+CA_FILE="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+
+if [ x"$KUBERNETES_PORT_443_TCP_ADDR" != x"" ]; then
+    if [ -f $CA_FILE ]; then
+        OC_CA_ARGS="--certificate-authority $CA_FILE"
+    else
+        OC_CA_ARGS="--insecure-skip-tls-verify"
+    fi
+
+    oc config set-cluster local $OC_CA_ARGS --server \
+        "https://$KUBERNETES_PORT_443_TCP_ADDR:$KUBERNETES_PORT_443_TCP_PORT" 
+
+    oc config set-context local --cluster local
+    oc config use-context local
+fi
+
+# Try and work out the correct version of the command line tools to use
+# if not explicitly defined by the template. This assumes you will be
+# using the same cluster the deployment is to. We hope the above setup
+# will work okay with the default 'oc' version if no version was defined
+# and before we can work out the correct version to use.
+
+if [ -z "$KUBECTL_VERSION" ]; then
+    KUBECTL_VERSION=`/usr/local/bin/kubectl-1.11.0 version -o json | \
+        python -c 'import sys, json; \
+        info = json.loads(sys.stdin.read())["serverVersion"]; \
+        print("%s.%s" % (info["major"], info["minor"]))'`
+fi
+
+if [ -z "$OC_VERSION" ]; then
+    case "$KUBECTL_VERSION" in
+        1.10|1.10+)
+            OC_VERSION=3.10
+            ;;
+        1.11|1.11+)
+            OC_VERSION=3.11
+            ;;
+    esac
+fi
+
+if [ -z "$ODO_VERSION" ]; then
+    ODO_VERSION=0.0.16
+fi
+
+export OC_VERSION
+export KUBECTL_VERSION
+export ODO_VERSION
+
+# Now attempt to login to the OpenShift cluster if have access to the
+# service account token.
+
+TOKEN_FILE="/var/run/secrets/kubernetes.io/serviceaccount/token"
+
+if [ x"$KUBERNETES_PORT_443_TCP_ADDR" != x"" ]; then
+    if [ -f $TOKEN_FILE ]; then
+        oc login $OC_CA_ARGS --token `cat $TOKEN_FILE` > /dev/null 2>&1
+    fi
+fi
+
+# Run startup actions if supplied.
+
+if [ -x /opt/app-root/etc/init.d/rc.local ]; then
+    /opt/app-root/etc/init.d/rc.local
+fi
+
+# Run workshop specific initialisation.
+
+if [ -x /opt/app-root/src/.workshop/setup ]; then
+    /opt/app-root/src/.workshop/setup
+fi
+
+# Run supervisord.
+
+exec supervisord --nodaemon \
+    --configuration /opt/workshop/etc/supervisord.conf

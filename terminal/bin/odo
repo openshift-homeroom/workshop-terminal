@@ -1,0 +1,18 @@
+#!/bin/bash
+
+ODO_VERSION_0_0=0.0.16
+
+ODO_VERSION=${ODO_VERSION:-$ODO_VERSION_0_0}
+
+case $ODO_VERSION in
+    $ODO_VERSION_0_0)
+        ;;
+    0.0|0.0.*)
+        ODO_VERSION=$ODO_VERSION_0_0
+        ;;
+    *)
+        ODO_VERSION=$ODO_VERSION_0_0
+        ;;
+esac
+
+exec /usr/local/bin/odo-$ODO_VERSION "$@"

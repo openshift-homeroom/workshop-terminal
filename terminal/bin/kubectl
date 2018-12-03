@@ -1,0 +1,24 @@
+#!/bin/bash
+
+KUBECTL_VERSION_1_10=1.10.0
+KUBECTL_VERSION_1_11=1.11.0
+
+KUBECTL_VERSION=${KUBECTL_VERSION:-$KUBECTL_VERSION_1_11}
+
+case $KUBECTL_VERSION in
+    $KUBECTL_VERSION_1_10)
+        ;;
+    1.10|1.10+|1.10.*)
+        KUBECTL_VERSION=$KUBECTL_VERSION_1_10
+        ;;
+    $KUBECTL_VERSION_1_11)
+        ;;
+    1.11|1.11+|1.11.*)
+        KUBECTL_VERSION=$KUBECTL_VERSION_1_11
+        ;;
+    *)
+        KUBECTL_VERSION=$KUBECTL_VERSION_1_11
+        ;;
+esac
+
+exec /usr/local/bin/kubectl-$KUBECTL_VERSION "$@"

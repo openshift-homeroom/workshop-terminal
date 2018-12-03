@@ -1,0 +1,23 @@
+#!/bin/bash
+
+set -x
+
+set -eo pipefail
+
+# Copy files to target directories.
+
+shopt -s dotglob
+
+mv /tmp/src/* . || true
+
+rm -rf /tmp/src
+
+# Run custom assemble script if required.
+
+if [ -x ./.workshop/build ]; then
+    ./.workshop/build
+fi
+
+# Fix up permissions.
+
+fix-permissions /opt/app-root

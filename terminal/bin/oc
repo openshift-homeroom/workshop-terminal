@@ -1,0 +1,24 @@
+#!/bin/bash
+
+OC_VERSION_3_10=3.10.79
+OC_VERSION_3_11=3.11.44
+
+OC_VERSION=${OC_VERSION:-$OC_VERSION_3_11}
+
+case $OC_VERSION in
+    $OC_VERSION_3_10)
+        ;;
+    3.10|3.10+|3.10.*)
+        OC_VERSION=$OC_VERSION_3_10
+        ;;
+    $OC_VERSION_3_11)
+        ;;
+    3.11|3.11+|3.11.*)
+        OC_VERSION=$OC_VERSION_3_11
+        ;;
+    *)
+        OC_VERSION=$OC_VERSION_3_11
+        ;;
+esac
+
+exec /usr/local/bin/oc-$OC_VERSION "$@"
