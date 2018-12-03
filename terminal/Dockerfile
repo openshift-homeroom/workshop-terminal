@@ -138,11 +138,11 @@ RUN source scl_source enable rh-python36 && \
 COPY profiles/. /opt/workshop/etc/profile.d/
 
 LABEL io.k8s.display-name="Terminal" \
-      io.openshift.expose-services="8080:http" \
+      io.openshift.expose-services="10080:http" \
       io.openshift.tags="builder,butterfly" \
       io.openshift.s2i.scripts-url=image:///usr/libexec/s2i
 
-EXPOSE 8080
+EXPOSE 10080
 
 USER 1001
 

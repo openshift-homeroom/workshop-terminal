@@ -26,7 +26,7 @@ fi
 
 cd /opt/workshop/butterfly
 
-exec /opt/workshop/butterfly/bin/butterfly.server.py --port=8081 \
+exec /opt/workshop/butterfly/bin/butterfly.server.py --port=10081 \
     --host=0.0.0.0 --uri-root-path="$URI_ROOT_PATH" --unsecure \
     --i-hereby-declare-i-dont-want-any-security-whatsoever \
     --shell=/opt/workshop/butterfly/start-terminal.sh --motd=$MOTD_FILE
