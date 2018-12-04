@@ -41,10 +41,10 @@ RUN HOME=/root && \
     ln -sf /usr/local/maven/bin/mvn /usr/local/bin/mvn
 
 RUN HOME=/root && \
-    curl -sL -0 https://services.gradle.org/distributions/gradle-2.6-bin.zip -o /tmp/gradle-2.6-bin.zip && \
-    unzip /tmp/gradle-2.6-bin.zip -d /usr/local/ && \
-    rm /tmp/gradle-2.6-bin.zip && \
-    mv /usr/local/gradle-2.6 /usr/local/gradle && \
+    curl -sL -0 https://services.gradle.org/distributions/gradle-5.0-bin.zip -o /tmp/gradle-5.0-bin.zip && \
+    unzip /tmp/gradle-5.0-bin.zip -d /usr/local/ && \
+    rm /tmp/gradle-5.0-bin.zip && \
+    mv /usr/local/gradle-5.0 /usr/local/gradle && \
     ln -sf /usr/local/gradle/bin/gradle /usr/local/bin/gradle
 
 # Install OpenShift clients.
