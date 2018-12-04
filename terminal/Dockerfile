@@ -35,9 +35,9 @@ RUN HOME=/root && \
     yum -y clean all --enablerepo='*'
 
 RUN HOME=/root && \
-    (curl -s -0 http://www.us.apache.org/dist/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz | \
+    (curl -s -0 http://www.us.apache.org/dist/maven/maven-3/3.6.0/binaries/apache-maven-3.6.0-bin.tar.gz | \
     tar -zx -C /usr/local) && \
-    mv /usr/local/apache-maven-3.3.9 /usr/local/maven && \
+    mv /usr/local/apache-maven-3.6.0 /usr/local/maven && \
     ln -sf /usr/local/maven/bin/mvn /usr/local/bin/mvn
 
 RUN HOME=/root && \
