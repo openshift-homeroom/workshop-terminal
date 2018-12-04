@@ -42,8 +42,8 @@
         },
         {
             "name": "AUTH_PASSWORD",
-	    "generate": "expression",
-	    "from": "[a-zA-Z0-9]{16}",
+            "generate": "expression",
+            "from": "[a-zA-Z0-9]{16}",
             "required": true
         }
     ],
@@ -87,9 +87,9 @@
                 }
             },
             "spec": {
-		"lookupPolicy": {
-		    "local": true
-		},
+                "lookupPolicy": {
+                    "local": true
+                },
                 "tags": [
                     {
                         "name": "latest",

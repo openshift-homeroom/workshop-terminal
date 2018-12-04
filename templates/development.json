@@ -37,8 +37,8 @@
         },
         {
             "name": "AUTH_PASSWORD",
-	    "generate": "expression",
-	    "from": "[a-zA-Z0-9]{16}",
+            "generate": "expression",
+            "from": "[a-zA-Z0-9]{16}",
             "required": true
         }
     ],
@@ -116,8 +116,8 @@
                     "type": "Docker",
                     "dockerStrategy": {
                         "from": {
-			    "kind": "DockerImage",
-			    "name": "centos/s2i-base-centos7:latest"
+                            "kind": "DockerImage",
+                            "name": "centos/s2i-base-centos7:latest"
                         }
                     }
                 },
