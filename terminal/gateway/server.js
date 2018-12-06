@@ -102,6 +102,16 @@ if (jupyterhub_client_id) {
             var code = req.query.code;
             var state = req.query.state;
 
+            // If there is no record of the handshake, return a bad request.
+
+            if (req.session.handshakes === undefined) {
+                return res.status(400).json('No session state');
+            }
+
+            if (req.session.handshakes[state] === undefined) {
+                return res.status(400).json('Invalid session');
+            }
+
             // This retrieves the next URL to redirect to from the session
             // for this particular oauth handshake.
 
@@ -180,6 +190,9 @@ if (jupyterhub_client_id) {
         // keyed by unique code for this oauth handshake. Use the code
         // as the state for oauth requests.
 
+        if (req.session.handshakes === undefined)
+            req.session.handshakes = {};
+
         if (Object.keys(req.session.handshakes).length > 10) {
             // If the number of oustanding auth handshakes gets to be
             // too many, something fishy going on so clear them all and
@@ -204,7 +217,7 @@ if (jupyterhub_client_id) {
     // oauth handshake.
 
     app.use(function (req, res, next) {
-        if (!req.session.handshakes)
+        if (req.session.handshakes === undefined)
             req.session.handshakes = {};
 
         if (!req.session.user) {
