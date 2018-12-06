@@ -56,7 +56,7 @@ if [ -z "$OC_VERSION" ]; then
 fi
 
 if [ -z "$ODO_VERSION" ]; then
-    ODO_VERSION=0.0.17
+    ODO_VERSION=0.0.16
 fi
 
 export OC_VERSION
