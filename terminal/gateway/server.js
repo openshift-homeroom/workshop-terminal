@@ -102,14 +102,18 @@ if (jupyterhub_client_id) {
             var code = req.query.code;
             var state = req.query.state;
 
-            // If there is no record of the handshake, return a bad request.
+            // If there is no tracking of handshakes for this session
+            // return a bad request.
 
             if (req.session.handshakes === undefined) {
                 return res.status(400).json('No session state');
             }
 
+            // If we seem to have no record of the specific handshake
+            // state, redirect back to the main page and start over.
+
             if (req.session.handshakes[state] === undefined) {
-                return res.status(400).json('Invalid session');
+                return res.redirect(uri_root_path + '/');
             }
 
             // This retrieves the next URL to redirect to from the session
@@ -193,8 +197,8 @@ if (jupyterhub_client_id) {
         if (req.session.handshakes === undefined)
             req.session.handshakes = {};
 
-        if (Object.keys(req.session.handshakes).length > 10) {
-            // If the number of oustanding auth handshakes gets to be
+        if (Object.keys(req.session.handshakes).length > 50) {
+            // If the number of outstanding auth handshakes gets to be
             // too many, something fishy going on so clear them all and
             // start over again.
 
