@@ -2,6 +2,8 @@
 
 set -x
 
+set -eo pipefail
+
 # Add entry to /etc/passwd file.
 
 whoami &> /dev/null || STATUS=$? && true
