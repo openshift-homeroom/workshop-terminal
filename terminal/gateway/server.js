@@ -9,8 +9,6 @@ var path = require('path');
 var url = require('url');
 var fs = require('fs');
 
-var Promise = require('promise');
-
 // Setup the root application. Everything will actually be under a
 // mount point corresponding to the specific user. This is added in
 // each of the routes when defined.
@@ -23,33 +21,9 @@ var uri_root_path = process.env.URI_ROOT_PATH || '';
 
 app.set('trust proxy', true);
 
-// For standalone container deployment, provide the ability to enable
-// authentication using HTTP Basic authentication. In this case there
-// will be no user object added to the client session.
-
-var auth_username = process.env.AUTH_USERNAME;
-var auth_password = process.env.AUTH_PASSWORD;
-
-function install_basic_auth() {
-    console.log('Register basic auth handler');
-
-    app.use(basic_auth({
-        challenge: true,
-        realm: 'Terminal',
-        authorizer: function (username, password) {
-            return username == auth_username && password == auth_password;
-        }
-    }));
-}
-
 // Enable use of a client session for the user. This is used to track
-// whether the user has logged in when using oauth. The expiry for the
-// cookie is relatively short as the oauth handshake is hidden from the
-// user as it is only negoitating with JupyterHub itself. Having a short
-// timeout means that the user will be periodically checked as still
-// being allowed to access the instance. This is so that a change by a
-// JupyterHub admin to status of a user is detected early and they are
-// kicked out.
+// whether the user has logged in when using oauth. Session will expire
+// after 24 hours.
 
 var handshakes = {}
 
@@ -61,16 +35,37 @@ app.use(session({
     secret: uuid.v4(),
     cookie: {
         path: uri_root_path,
-        maxAge: 60*1000
+        maxAge: 24*60*60*1000
     },
     resave: false,
     saveUninitialized: true
 }));
 
-// For JupyterHub, to ensure that only the user, or an admin can access
-// anything, we need to perform an oauth handshake with JupyterHub and
-// then validate that the user making the request is allowed to access
-// the specific instance.
+// For standalone container deployment, provide the ability to enable
+// authentication using HTTP Basic authentication. In this case there
+// will be no user object added to the client session.
+
+var auth_username = process.env.AUTH_USERNAME;
+var auth_password = process.env.AUTH_PASSWORD;
+
+async function install_basic_auth() {
+    console.log('Register basic auth handler');
+
+    app.use(basic_auth({
+        challenge: true,
+        realm: 'Terminal',
+        authorizer: function (username, password) {
+            return username == auth_username && password == auth_password;
+        }
+    }));
+}
+
+// For OAuth, two types of authentication methods are supported. The
+// first is where the terminal is behind JupyterHub. In this case
+// JupyterHub handles primary authentication of the user using whatever
+// method it chooses to use. In this case the terminal still needs to do
+// a OAuth handshake with JupyterHub. This mode of operation is setup by
+// the following environment variables.
 
 var jupyterhub_user = process.env.JUPYTERHUB_USER;
 var jupyterhub_client_id = process.env.JUPYTERHUB_CLIENT_ID;
@@ -78,168 +73,17 @@ var jupyterhub_api_url = process.env.JUPYTERHUB_API_URL;
 var jupyterhub_api_token = process.env.JUPYTERHUB_API_TOKEN;
 var jupyterhub_route = process.env.JUPYTERHUB_ROUTE
 
-function install_jupyterhub_auth() {
-    var api_url = url.parse(jupyterhub_api_url);
-
-    var credentials = {
-        client: {
-            id: jupyterhub_client_id,
-            secret: jupyterhub_api_token
-        },
-        auth: {
-            tokenHost: jupyterhub_route,
-            authorizePath: api_url.pathname + '/oauth2/authorize',
-            tokenPath: api_url.pathname + '/oauth2/token'
-        },
-        options: {
-            authorizationMethod: 'body',
-        },
-        http: {
-            rejectUnauthorized: false
-        }
-    };
-
-    var oauth2 = require('simple-oauth2').create(credentials);
-
-    // Define the oauth callback URL. This is the means that the access
-    // token is passed back from JupyterHub for the user. From within
-    // this we also check back with JupyterHub that the user has access
-    // to this instance by fetching the user details and ensuring they
-    // are an admin or they are the user for the instance.
-
-    app.get(uri_root_path + '/oauth_callback', async (req, res) => {
-        try {
-            var code = req.query.code;
-            var state = req.query.state;
-
-            // If we seem to have no record of the specific handshake
-            // state, redirect back to the main page and start over.
-
-            if (handshakes[state] === undefined) {
-                return res.redirect(uri_root_path + '/');
-            }
-
-            // This retrieves the next URL to redirect to from the session
-            // for this particular oauth handshake.
-
-            var next_url = handshakes[state];
-            delete handshakes[state];
-
-            var options = {
-                code: code,
-                redirect_uri: uri_root_path + '/oauth_callback',
-            };
-
-            var auth_result = await oauth2.authorizationCode.getToken(options);
-            var token_result = oauth2.accessToken.create(auth_result);
-
-            var user_url = jupyterhub_api_url + '/user';
-
-            var parsed_user_url = url.parse(user_url);
-
-            var user_url_options = {
-                host: parsed_user_url.hostname,
-                port: parsed_user_url.port,
-                path: parsed_user_url.path,
-                headers: {
-                    authorization: 'token ' + token_result.token.access_token
-                }
-            };
-
-            // This is the callback to fetch the user details from
-            // JupyterHub so we can authorize that they have access.
-
-            http.get(user_url_options, (user_res) => {
-                let data = '';
-
-                user_res.on('data', (chunk) => {
-                    data += chunk;
-                });
-
-                user_res.on('end', () => {
-                    user = JSON.parse(data);
-
-                    // The user who has logged in must be an admin or
-                    // the user of the instance.
-
-                    if (!user.admin) {
-                        if (user.name != jupyterhub_user) {
-                            return res.status(403).json('Access forbidden');
-                        }
-                    }
-
-                    req.session.user = user;
-
-                    console.log('Allowing access to', user);
-
-                    res.redirect(next_url);
-
-                    return;
-                });
-            }).on('error', (err) => {
-                console.error('Error', err.message);
-                return res.status(500).json('Error occurred');
-            });
-
-            return;
-        } catch(err) {
-            console.error('Error', err.message);
-            return res.status(500).json('Authentication failed');
-        }
-    });
-
-    // Handler which triggers the oauth handshake. Will be redirected
-    // here whenever any request arrives and user has not been verified
-    // or when the user session has expired and need to revalidate.
-
-    app.get(uri_root_path + '/oauth_handshake', (req, res) => {
-        // Stash the next URL after authentication in the user session
-        // keyed by unique code for this oauth handshake. Use the code
-        // as the state for oauth requests.
-
-        var state = uuid.v4();
-        handshakes[state] = req.query.next;
-
-        const authorization_uri = oauth2.authorizationCode.authorizeURL({
-            redirect_uri: uri_root_path + '/oauth_callback',
-            state: state
-        });
-
-        res.redirect(authorization_uri);
-    });
-
-    // This intercepts all incoming requests and if the user hasn't been
-    // validated, or validation has expired, then will redirect into the
-    // oauth handshake.
-
-    app.use(function (req, res, next) {
-        if (!req.session.user) {
-            next_url = encodeURIComponent(req.url);
-            res.redirect(uri_root_path + '/oauth_handshake?next=' + next_url);
-        }
-        else {
-            next();
-        }
-    })
-}
-
-// For authentication using OpenShift OAuth, we perform the handshake
-// and then also need to validate that the user is a member of the
-// project the terminal is deployed in and with appropriate role.
+// The second authentication method using OAuth is where the terminal
+// delegates authentication to OpenShift itself. In this case the
+// service accounts is used as an OAuth proxy. This mode of operation
+// is setup by the following environment variables.
 
 var oauth_service_account = process.env.OAUTH_SERVICE_ACCOUNT;
 
-async function get_oauth_metadata(server) {
-    const options = {
-        baseURL: server,
-        httpsAgent: new https.Agent({ rejectUnauthorized: false }),
-        responseType: 'json'
-    };
-
-    const url = '/.well-known/oauth-authorization-server';
-
-    return (await axios.get(url, options)).data;
-}
+// These functions provide details on the project the deployment is,
+// the service account name and the service token. These are only used
+// when using OpenShift OAuth and rely on the service account details
+// being mounted into the container.
 
 function project_name() {
     const account_path = '/var/run/secrets/kubernetes.io/serviceaccount';
@@ -262,7 +106,24 @@ function service_account_token() {
     return fs.readFileSync(token_path, 'utf8');
 }
 
-function setup_openshift_credentials(metadata, client_id, client_secret) {
+// OAuth servers support a well known URL for querying properties of the
+// OAuth server. Unfortunately JupyterHub doesn't support this, so we
+// need to fake up this data later. We can use this for the case when
+// using OpenShift OAuth.
+
+async function get_oauth_metadata(server) {
+    const options = {
+        baseURL: server,
+        httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+        responseType: 'json'
+    };
+
+    const url = '/.well-known/oauth-authorization-server';
+
+    return (await axios.get(url, options)).data;
+}
+
+function setup_oauth_credentials(metadata, client_id, client_secret) {
     var credentials = {
         client: {
             id: client_id,
@@ -283,6 +144,42 @@ function setup_openshift_credentials(metadata, client_id, client_secret) {
 
     return credentials;
 }
+
+// When using JupyterHub OAuth, after the user has authenticated, to
+// verify the user we need to make sure that they are the owner of the
+// instance, or that they are an admin.
+
+async function get_jupyterhub_user_details(access_token) {
+    const options = {
+        baseURL: jupyterhub_api_url,
+        headers: { 'Authorization': 'Bearer ' + access_token },
+        responseType: 'json'
+    };
+
+    const url = '/user';
+
+    return (await axios.get(url, options)).data;
+}
+
+async function verify_jupyterhub_user(access_token) {
+    var details = await get_jupyterhub_user_details(access_token);
+
+    console.log('JupyterHub user name', details.name);
+
+    if (details.admin)
+        return details.name;
+
+    if (details.name == jupyterhub_user)
+        return details.name;
+
+    console.log('User forbidden access', details.name);
+}
+
+// When using OpenShift OAuth, after the user has authenticated, to
+// verify the user we need to check whether the user is as admin of the
+// project the deployment is in. This assumes the deployment is done
+// using a service account with admin access on the project as it needs
+// to be able to query rolebindings for the project.
 
 var kubernetes_host = process.env.KUBERNETES_PORT_443_TCP_ADDR;
 var kubernetes_port = process.env.KUBERNETES_PORT_443_TCP_PORT;
@@ -349,13 +246,11 @@ async function verify_openshift_user(access_token) {
     console.log('User forbidden access', name);
 }
 
-function register_openshift_callback(oauth2) {
-    // Define the oauth callback URL. This is the means that the access
-    // token is passed back from JupyterHub for the user. From within
-    // this we also check back with JupyterHub that the user has access
-    // to this instance by fetching the user details and ensuring they
-    // are an admin or they are the user for the instance.
+// Setup the OAuth callback that the OAuth server makes a request
+// against to deliver the access code when authentication has been
+// successful.
 
+function register_oauth_callback(oauth2, verify_user, same_origin) {
     console.log('Register OAuth callback');
 
     app.get(uri_root_path + '/oauth_callback', async (req, res) => {
@@ -376,16 +271,33 @@ function register_openshift_callback(oauth2) {
             var next_url = handshakes[state];
             delete handshakes[state];
 
-            // Obtain the user access token using the authorization code.
+            // Obtain the user access token using the authorization
+            // code. The same_origin flags is to indicate whether the
+            // OAuth server is under the same hostname or not. This is
+            // the case for JupyterHub OAuth. Need to treat this
+            // differently as JupyterHub doesn't like it when the
+            // redirect_uri has a hostname in it. Instead it wants just
+            // the path. This is okay since are under the same origin.
+            // That said, technically, not ensure sure the redirect_uri
+            // is used at this point but documentation for oauth
+            // packages has it in examples.
 
-            var redirect_uri = [req.protocol, '://', req.hostname,
-                uri_root_path, '/oauth_callback'].join('');
+            var redirect_uri;
+
+            if (!same_origin) {
+                redirect_uri = [req.protocol, '://', req.hostname,
+                    uri_root_path, '/oauth_callback'].join('');
+            } else {
+                redirect_uri = [uri_root_path, '/oauth_callback'].join('');
+            }
 
             var options = {
                 redirect_uri: redirect_uri,
                 scope: 'user:info',
                 code: code
             };
+
+            console.log('token_options', options);
 
             var auth_result = await oauth2.authorizationCode.getToken(options);
             var token_result = oauth2.accessToken.create(auth_result);
@@ -394,17 +306,16 @@ function register_openshift_callback(oauth2) {
             console.log('token_result', token_result);
 
             // Now we need to verify whether this user is allowed access
-            // to the project. For this we require that the user have the
-            // admin role in the project since full control of the project
-            // would be given to the container. First we need to work out
-            // who the user is.
+            // to the project.
 
-            req.session.user = await verify_openshift_user(
+            req.session.user = await verify_user(
                 token_result['token']['access_token']);
 
             if (!req.session.user) {
-                return res.status(403).json('Forbidden');
+                return res.status(403).json('Access forbidden');
             }
+
+            console.log('User access granted', req.session.user);
 
             return res.redirect(next_url);
         } catch(err) {
@@ -412,11 +323,11 @@ function register_openshift_callback(oauth2) {
             return res.status(500).json('Authentication failed');
         }
     });
-
-    return oauth2;
 }
 
-function register_oauth_handshake(oauth2) {
+// Setup up redirection to the OAuth server authorization endpoint.
+
+function register_oauth_handshake(oauth2, same_origin) {
     console.log('Register OAuth handshake');
 
     app.get(uri_root_path + '/oauth_handshake', (req, res) => {
@@ -427,14 +338,30 @@ function register_oauth_handshake(oauth2) {
         var state = uuid.v4();
         handshakes[state] = req.query.next;
 
-        var redirect_uri = [req.protocol, '://', req.hostname,
-            uri_root_path, '/oauth_callback'].join('');
+        // Redirect to the authorization end point for the OAuth server.
+        // The same_origin flags is to indicate whether the OAuth server
+        // is under the same hostname or not. This is the case for
+        // JupyterHub OAuth. Need to treat this differently as
+        // JupyterHub doesn't like it when the redirect_uri has a
+        // hostname in it. Instead it wants just the path. This is okay
+        // since are under the same origin.
+
+        var redirect_uri;
+
+        if (!same_origin) {
+            redirect_uri = [req.protocol, '://', req.hostname,
+                uri_root_path, '/oauth_callback'].join('');
+        } else {
+            redirect_uri = [uri_root_path, '/oauth_callback'].join('');
+        }
 
         const authorization_uri = oauth2.authorizationCode.authorizeURL({
             redirect_uri: redirect_uri,
             scope: 'user:info',
             state: state
         });
+
+        console.log('authorization_uri', authorization_uri);
 
         res.redirect(authorization_uri);
     });
@@ -450,6 +377,42 @@ function register_oauth_handshake(oauth2) {
     })
 }
 
+// Setup routes etc, corresponding to requirements of different possible
+// authentication methods used.
+
+async function install_jupyterhub_auth() {
+    // JupyterHub OAuth server doesn't support URL for query properties
+    // of the server, so fake up the metadata here so can create the
+    // credentials.
+
+    var issuer = jupyterhub_route;
+
+    var client_id = jupyterhub_client_id;
+    var client_secret = jupyterhub_api_token;
+
+    var api_url = url.parse(jupyterhub_api_url);
+
+    var metadata = {
+        issuer: issuer,
+        authorization_endpoint: issuer + api_url.pathname + '/oauth2/authorize',
+        token_endpoint: issuer + api_url.pathname + '/oauth2/token'
+    };
+
+    console.log('OAuth server metadata', metadata);
+
+    var credentials = setup_oauth_credentials(metadata, client_id,
+        client_secret);
+
+    console.log('OAuth server credentials', credentials);
+
+    var oauth2 = require('simple-oauth2').create(credentials);
+
+    var same_origin = true;
+
+    register_oauth_callback(oauth2, verify_jupyterhub_user, same_origin);
+    register_oauth_handshake(oauth2, same_origin);
+}
+
 async function install_openshift_auth() {
     var server = 'https://openshift.default.svc.cluster.local';
     var client_id = service_account_name(oauth_service_account);
@@ -459,21 +422,23 @@ async function install_openshift_auth() {
 
     console.log('OAuth server metadata', metadata);
 
-    var credentials = setup_openshift_credentials(metadata, client_id,
+    var credentials = setup_oauth_credentials(metadata, client_id,
         client_secret);
 
     console.log('OAuth server credentials', credentials);
 
     var oauth2 = require('simple-oauth2').create(credentials);
 
-    register_openshift_callback(oauth2);
-    register_oauth_handshake(oauth2);
+    var same_origin = false;
+
+    register_oauth_callback(oauth2, verify_openshift_user, same_origin);
+    register_oauth_handshake(oauth2, same_origin);
 }
 
 async function setup_access() {
     if (jupyterhub_client_id) {
         console.log('Install JupyterHub auth support');
-        install_jupyterhub_auth();
+        await install_jupyterhub_auth();
     }
     else if (oauth_service_account) {
         console.log('Install OpenShift auth support');
@@ -481,7 +446,7 @@ async function setup_access() {
     }
     else if (auth_username) {
         console.log('Install HTTP Basic auth support');
-        install_basic_auth();
+        await install_basic_auth();
     }
 }
 
