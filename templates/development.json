@@ -14,11 +14,6 @@
             "required": true
         },
         {
-            "name": "PROJECT_ROLE",
-            "value": "edit",
-            "required": true
-        },
-        {
             "name": "OC_VERSION",
             "value": ""
         },
@@ -29,17 +24,6 @@
         {
             "name": "KUBECTL_VERSION",
             "value": ""
-        },
-        {
-            "name": "AUTH_USERNAME",
-            "value": "workshop",
-            "required": true
-        },
-        {
-            "name": "AUTH_PASSWORD",
-            "generate": "expression",
-            "from": "[a-zA-Z0-9]{16}",
-            "required": true
         }
     ],
     "objects": [
@@ -47,9 +31,14 @@
             "kind": "ServiceAccount",
             "apiVersion": "v1",
             "metadata": {
-                "name": "${APPLICATION_NAME}-role",
+                "name": "${APPLICATION_NAME}-user",
                 "labels": {
                     "app": "${APPLICATION_NAME}"
+                },
+                "annotations": {
+                    "serviceaccounts.openshift.io/oauth-redirectreference.first": "{\"kind\":\"OAuthRedirectReference\",\"apiVersion\":\"v1\",\"reference\":{\"kind\":\"Route\",\"name\":\"${APPLICATION_NAME}\"}}",
+                    "serviceaccounts.openshift.io/oauth-redirecturi.first": "oauth_callback",
+                    "serviceaccounts.openshift.io/oauth-want-challenges": "false"
                 }
             }
         },
@@ -57,7 +46,7 @@
             "kind": "RoleBinding",
             "apiVersion": "v1",
             "metadata": {
-                "name": "${APPLICATION_NAME}-${PROJECT_ROLE}",
+                "name": "${APPLICATION_NAME}-admin",
                 "labels": {
                     "app": "${APPLICATION_NAME}"
                 }
@@ -65,11 +54,11 @@
             "subjects": [
                 {
                     "kind": "ServiceAccount",
-                    "name": "${APPLICATION_NAME}-role"
+                    "name": "${APPLICATION_NAME}-user"
                 }
             ],
             "roleRef": {
-                "name": "${PROJECT_ROLE}"
+                "name": "admin"
             }
         },
         {
@@ -108,7 +97,8 @@
                 "source": {
                     "type": "Git",
                     "git": {
-                        "uri": "https://github.com/openshift-labs/workshop-terminal.git"
+                        "uri": "https://github.com/openshift-labs/workshop-terminal.git",
+                        "ref": "develop"
                     },
                     "contextDir": "terminal"
                 },
@@ -173,7 +163,7 @@
                         }
                     },
                     "spec": {
-                        "serviceAccountName": "${APPLICATION_NAME}-role",
+                        "serviceAccountName": "${APPLICATION_NAME}-user",
                         "containers": [
                             {
                                 "name": "terminal",
@@ -185,12 +175,8 @@
                                 ],
                                 "env": [
                                     {
-                                        "name": "AUTH_USERNAME",
-                                        "value": "${AUTH_USERNAME}"
-                                    },
-                                    {
-                                        "name": "AUTH_PASSWORD",
-                                        "value": "${AUTH_PASSWORD}"
+                                        "name": "OAUTH_SERVICE_ACCOUNT",
+                                        "value": "${APPLICATION_NAME}-user"
                                     }
                                 ]
                             }
