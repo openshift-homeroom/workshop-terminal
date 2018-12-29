@@ -6,7 +6,7 @@ set -eo pipefail
 
 # Add entry to /etc/passwd file.
 
-whoami &> /dev/null || STATUS=$? && true
+STATUS=0 && whoami &> /dev/null || STATUS=$? && true
 
 if [[ "$STATUS" != "0" ]]; then
     cat /etc/passwd | sed -e "s/^default:/builder:/" > /tmp/passwd
@@ -39,11 +39,13 @@ fi
 # will work okay with the default 'oc' version if no version was defined
 # and before we can work out the correct version to use.
 
-if [ -z "$KUBECTL_VERSION" ]; then
-    KUBECTL_VERSION=`/usr/local/bin/kubectl-1.11.0 version -o json | \
-        python -c 'import sys, json; \
-        info = json.loads(sys.stdin.read())["serverVersion"]; \
-        print("%s.%s" % (info["major"], info["minor"]))'`
+if [ x"$KUBERNETES_PORT_443_TCP_ADDR" != x"" ]; then
+    if [ -z "$KUBECTL_VERSION" ]; then
+        KUBECTL_VERSION=`(/usr/local/bin/kubectl-1.11.0 version -o json | \
+            python -c 'from __future__ import print_function; import sys, json; \
+            info = json.loads(sys.stdin.read()).get("serverVersion"); \
+            info and print("%s.%s" % (info["major"], info["minor"]))') || true`
+    fi
 fi
 
 if [ -z "$OC_VERSION" ]; then
