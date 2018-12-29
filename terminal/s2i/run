@@ -6,7 +6,7 @@ set -eo pipefail
 
 # Add entry to /etc/passwd file.
 
-whoami &> /dev/null || STATUS=$? && true
+STATUS=0 && whoami &> /dev/null || STATUS=$? && true
 
 if [[ "$STATUS" != "0" ]]; then
     cat /etc/passwd | sed -e "s/^default:/builder:/" > /tmp/passwd
