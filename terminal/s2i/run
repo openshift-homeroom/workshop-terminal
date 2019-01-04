@@ -78,6 +78,20 @@ if [ x"$KUBERNETES_PORT_443_TCP_ADDR" != x"" ]; then
     fi
 fi
 
+# If the host used in cluster subdomain for applications is not defined
+# try and determine by querying the REST API. Ignore any errors.
+
+if [ x"$CLUSTER_SUBDOMAIN" = x"" ]; then
+    if [ x"$APPLICATION_NAME" = x"" ]; then
+        APPLICATION_NAME=`echo $HOSTNAME | sed -e 's/-[0-9]*-[a-z0-9]*$//'`
+    fi
+
+    APPLICATION_HOST=`oc get route $APPLICATION_NAME -o template --template '{{.spec.host}}{{"\n"}}' 2>/dev/null || true`
+
+    CLUSTER_SUBDOMAIN=`echo $APPLICATION_HOST | sed -e 's/[a-z0-9-]*\.//'`
+    export CLUSTER_SUBDOMAIN
+fi
+
 # Run startup actions if supplied.
 
 if [ -x /opt/app-root/etc/init.d/rc.local ]; then

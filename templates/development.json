@@ -175,6 +175,10 @@
                                 ],
                                 "env": [
                                     {
+                                        "name": "APPLICATION_NAME",
+                                        "value": "${APPLICATION_NAME}"
+                                    },
+                                    {
                                         "name": "OAUTH_SERVICE_ACCOUNT",
                                         "value": "${APPLICATION_NAME}-user"
                                     }
