@@ -12,6 +12,8 @@ app.get('^/?$', function (req, res) {
     res.redirect(req.baseUrl + '/session/1');
 })
 
+app.use('/static', express.static('/opt/workshop/butterfly/static'));
+
 app.use(proxy({
     target: 'http://127.0.0.1:10081',
     ws: true
