@@ -172,7 +172,7 @@ async function get_jupyterhub_user_details(access_token) {
 async function verify_jupyterhub_user(access_token) {
     var details = await get_jupyterhub_user_details(access_token);
 
-    logger.info('JupyterHub user name', details.name);
+    logger.info('JupyterHub user name', {name:details.name});
 
     if (details.admin)
         return details.name;
@@ -180,7 +180,7 @@ async function verify_jupyterhub_user(access_token) {
     if (details.name == jupyterhub_user)
         return details.name;
 
-    logger.info('User forbidden access', details.name);
+    logger.info('User forbidden access', {name:details.name});
 }
 
 // When using OpenShift OAuth, after the user has authenticated, to
@@ -244,16 +244,16 @@ async function get_openshift_admin_users() {
 async function verify_openshift_user(access_token) {
     var users = await get_openshift_admin_users();
 
-    logger.info('OpenShift admin users', users);
+    logger.info('OpenShift admin users', {users:users});
 
     var name = await get_openshift_user_details(access_token);
 
-    logger.info('OpenShift user name', name);
+    logger.info('OpenShift user name', {name:name});
 
     if (users.includes(name))
         return name;
 
-    logger.info('User forbidden access', name);
+    logger.info('User forbidden access', {name:name});
 }
 
 // Setup the OAuth callback that the OAuth server makes a request
@@ -307,13 +307,13 @@ function register_oauth_callback(oauth2, verify_user, same_origin) {
                 code: code
             };
 
-            logger.debug('token_options', options);
+            logger.debug('token_options', {options:options});
 
             var auth_result = await oauth2.authorizationCode.getToken(options);
             var token_result = oauth2.accessToken.create(auth_result);
 
-            logger.debug('auth_result', auth_result);
-            logger.debug('token_result', token_result);
+            logger.debug('auth_result', {result:auth_result});
+            logger.debug('token_result', {result:token_result});
 
             // Now we need to verify whether this user is allowed access
             // to the project.
@@ -325,7 +325,7 @@ function register_oauth_callback(oauth2, verify_user, same_origin) {
                 return res.status(403).json('Access forbidden');
             }
 
-            logger.info('User access granted', req.session.user);
+            logger.info('User access granted', {name:req.session.user});
 
             return res.redirect(next_url);
         } catch(err) {
@@ -371,7 +371,7 @@ function register_oauth_handshake(oauth2, same_origin) {
             state: state
         });
 
-        logger.debug('authorization_uri', authorization_uri);
+        logger.debug('authorization_uri', {uri:authorization_uri});
 
         res.redirect(authorization_uri);
     });
@@ -408,12 +408,12 @@ async function install_jupyterhub_auth() {
         token_endpoint: issuer + api_url.pathname + '/oauth2/token'
     };
 
-    logger.info('OAuth server metadata', metadata);
+    logger.info('OAuth server metadata', {metadata:metadata});
 
     var credentials = setup_oauth_credentials(metadata, client_id,
         client_secret);
 
-    logger.info('OAuth server credentials', credentials);
+    logger.info('OAuth server credentials', {credentials:credentials});
 
     var oauth2 = require('simple-oauth2').create(credentials);
 
@@ -430,12 +430,12 @@ async function install_openshift_auth() {
 
     var metadata = await get_oauth_metadata(server);
 
-    logger.info('OAuth server metadata', metadata);
+    logger.info('OAuth server metadata', {metadata:metadata});
 
     var credentials = setup_oauth_credentials(metadata, client_id,
         client_secret);
 
-    logger.info('OAuth server credentials', credentials);
+    logger.info('OAuth server credentials', {credentials:credentials});
 
     var oauth2 = require('simple-oauth2').create(credentials);
 
@@ -470,15 +470,15 @@ function set_default_page() {
     var override_index = '/opt/app-root/gateway/routes/index.js';
 
     if (fs.existsSync(override_index)) {
-        logger.info('Set index to', override_index); 
+        logger.info('Set index to', {path:override_index}); 
         app.get('^' + uri_root_path + '/?$', require(override_index));
     }
     else if (fs.existsSync(default_index)) {
-        logger.info('Set index to', default_index); 
+        logger.info('Set index to', {path:default_index}); 
         app.get('^' + uri_root_path + '/?$', require(default_index));
     }
     else {
-        logger.info('Set index to', default_route); 
+        logger.info('Set index to', {path:default_route}); 
         app.get('^' + uri_root_path + '/?$', function (req, res) {
             res.redirect(uri_root_path + default_route);
         });
@@ -505,7 +505,7 @@ function install_routes(directory) {
                     var pathname = path.join(directory, filename);
                     var router = require(pathname);
 
-                    logger.info('Install route for', pathname);
+                    logger.info('Install route for', {path:pathname});
 
                     app.use(prefix + '/', router);
                 }
@@ -524,7 +524,7 @@ function setup_routing() {
 // Start the listener.
 
 function start_listener() {
-    logger.info('Start listener.');
+    logger.info('Start listener');
 
     app.listen(10080);
 }
