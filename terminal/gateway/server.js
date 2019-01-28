@@ -503,7 +503,7 @@ function install_routes(directory) {
                     });
 
                     var pathname = path.join(directory, filename);
-                    var router = require(pathname);
+                    var router = require(pathname)(app, prefix + '/');
 
                     logger.info('Install route for', {path:pathname});
 
