@@ -56,6 +56,9 @@ if [ -z "$OC_VERSION" ]; then
         1.11|1.11+)
             OC_VERSION=3.11
             ;;
+        1.12|1.12+)
+            OC_VERSION=4.0
+            ;;
     esac
 fi
 
