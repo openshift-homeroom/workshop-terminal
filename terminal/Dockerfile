@@ -5,7 +5,8 @@ USER root
 # Install additional common utilities.
 
 RUN HOME=/root && \
-    INSTALL_PKGS="supervisor nano python-devel" && \
+    INSTALL_PKGS="supervisor nano python-devel bash-completion \
+        bash-completion-extras" && \
     yum install -y centos-release-scl epel-release && \
     yum -y --setopt=tsflags=nodocs install --enablerepo=centosplus $INSTALL_PKGS && \
     rpm -V $INSTALL_PKGS && \
@@ -127,6 +128,8 @@ RUN mkdir -p /opt/app-root/etc/init.d && \
     mkdir -p /opt/app-root/gateway/routes && \
     chown -R 1001:0 /opt/app-root && \
     fix-permissions /opt/app-root
+
+COPY .bash_profile /opt/app-root/src/.bash_profile
 
 RUN source scl_source enable rh-python36 && \
     virtualenv /opt/app-root && \
