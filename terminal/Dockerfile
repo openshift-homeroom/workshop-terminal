@@ -5,7 +5,8 @@ USER root
 # Install additional common utilities.
 
 RUN HOME=/root && \
-    INSTALL_PKGS="supervisor nano python-devel" && \
+    INSTALL_PKGS="supervisor nano python-devel bash-completion \
+        bash-completion-extras" && \
     yum install -y centos-release-scl epel-release && \
     yum -y --setopt=tsflags=nodocs install --enablerepo=centosplus $INSTALL_PKGS && \
     rpm -V $INSTALL_PKGS && \
@@ -49,19 +50,27 @@ RUN HOME=/root && \
 
 # Install OpenShift clients.
 
-RUN curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v3/clients/3.10.79/linux/oc.tar.gz && \
+RUN curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v3/clients/3.10.113/linux/oc.tar.gz && \
     tar -C /usr/local/bin -zxvf /tmp/oc.tar.gz oc && \
-    mv /usr/local/bin/oc /usr/local/bin/oc-3.10.79 && \
+    mv /usr/local/bin/oc /usr/local/bin/oc-3.10.113 && \
     rm /tmp/oc.tar.gz && \
-    curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v3/clients/3.11.44/linux/oc.tar.gz && \
+    curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v3/clients/3.11.83/linux/oc.tar.gz && \
     tar -C /usr/local/bin -zxvf /tmp/oc.tar.gz oc && \
-    mv /usr/local/bin/oc /usr/local/bin/oc-3.11.44 && \
+    mv /usr/local/bin/oc /usr/local/bin/oc-3.11.83 && \
+    rm /tmp/oc.tar.gz && \
+    curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v3/clients/4.0.0-0.171.0/linux/oc.tar.gz && \
+    tar -C /usr/local/bin -zxvf /tmp/oc.tar.gz oc && \
+    mv /usr/local/bin/oc /usr/local/bin/oc-4.0.0-0.171.0 && \
     rm /tmp/oc.tar.gz
 
 RUN curl -sL -o /usr/local/bin/odo-0.0.16 https://github.com/redhat-developer/odo/releases/download/v0.0.16/odo-linux-amd64 && \
     chmod +x /usr/local/bin/odo-0.0.16 && \
     curl -sL -o /usr/local/bin/odo-0.0.17 https://github.com/redhat-developer/odo/releases/download/v0.0.17/odo-linux-amd64 && \
-    chmod +x /usr/local/bin/odo-0.0.17
+    chmod +x /usr/local/bin/odo-0.0.17 && \
+    curl -sL -o /usr/local/bin/odo-0.0.18 https://github.com/redhat-developer/odo/releases/download/v0.0.18/odo-linux-amd64 && \
+    chmod +x /usr/local/bin/odo-0.0.18 && \
+    curl -sL -o /usr/local/bin/odo-0.0.19 https://github.com/redhat-developer/odo/releases/download/v0.0.19/odo-linux-amd64 && \
+    chmod +x /usr/local/bin/odo-0.0.19
 
 # Install Kubernetes client.
 
@@ -70,7 +79,10 @@ RUN curl -sL -o /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes
     chmod +x /usr/local/bin/kubectl-1.10.0 && \
     curl -sL -o /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.11.0/bin/linux/amd64/kubectl && \
     mv /usr/local/bin/kubectl /usr/local/bin/kubectl-1.11.0 && \
-    chmod +x /usr/local/bin/kubectl-1.11.0
+    chmod +x /usr/local/bin/kubectl-1.11.0 && \
+    curl -sL -o /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.12.0/bin/linux/amd64/kubectl && \
+    mv /usr/local/bin/kubectl /usr/local/bin/kubectl-1.12.0 && \
+    chmod +x /usr/local/bin/kubectl-1.12.0
 
 # Common environment variables.
 
@@ -127,6 +139,8 @@ RUN mkdir -p /opt/app-root/etc/init.d && \
     mkdir -p /opt/app-root/gateway/routes && \
     chown -R 1001:0 /opt/app-root && \
     fix-permissions /opt/app-root
+
+COPY .bash_profile /opt/app-root/src/.bash_profile
 
 RUN source scl_source enable rh-python36 && \
     virtualenv /opt/app-root && \
