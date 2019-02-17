@@ -67,10 +67,10 @@ export KUBECTL_VERSION
 export ODO_VERSION
 
 # Now attempt to login to the OpenShift cluster. First check whether we
-# inherited a user access token mounted in through a configmap or from an
-# emptydir volume initialised from an init container. If not, see if we
-# have been passed in a username/password to use to login. Finally, see
-# if service account token has been mounted into the container.
+# inherited a user access token from the .kube directory via an emptydir
+# volume initialised from an init container. If not, see if we have been
+# passed in a username/password to use to login. Finally, see if the
+# service account token has been mounted into the container.
 
 USER_TOKEN_FILE="/opt/app-root/src/.kube/token"
 ACCT_TOKEN_FILE="/var/run/secrets/kubernetes.io/serviceaccount/token"
@@ -89,6 +89,14 @@ if [ x"$KUBERNETES_PORT_443_TCP_ADDR" != x"" ]; then
             fi
         fi
     fi
+fi
+
+# If we have been supplied the name of a OpenShift project to use, change
+# to that specific project, rather than rely on default selected, and try
+# and create the project if it doesn't exist.
+
+if [ x"$OPENSHIFT_PROJECT" != x"" ]; then
+    oc project "$OPENSHIFT_PROJECT" || oc new-project "$OPENSHIFT_PROJECT" > /dev/null 2>&1
 fi
 
 # If the host used in cluster subdomain for applications is not defined
