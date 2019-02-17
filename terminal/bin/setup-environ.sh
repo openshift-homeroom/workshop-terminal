@@ -72,7 +72,7 @@ export ODO_VERSION
 # have been passed in a username/password to use to login. Finally, see
 # if service account token has been mounted into the container.
 
-USER_TOKEN_FILE="/opt/app-root/user/token"
+USER_TOKEN_FILE="/opt/app-root/src/.kube/token"
 ACCT_TOKEN_FILE="/var/run/secrets/kubernetes.io/serviceaccount/token"
 
 if [ x"$KUBERNETES_PORT_443_TCP_ADDR" != x"" ]; then
