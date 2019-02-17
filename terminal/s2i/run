@@ -70,14 +70,28 @@ export OC_VERSION
 export KUBECTL_VERSION
 export ODO_VERSION
 
-# Now attempt to login to the OpenShift cluster if have access to the
-# service account token.
+# Now attempt to login to the OpenShift cluster. First check whether we
+# inherited a user access token mounted in through a configmap or from an
+# emptydir volume initialised from an init container. If not, see if we
+# have been passed in a username/password to use to login. Finally, see
+# if service account token has been mounted into the container.
 
-TOKEN_FILE="/var/run/secrets/kubernetes.io/serviceaccount/token"
+USER_TOKEN_FILE="/opt/app-root/user/token"
+ACCT_TOKEN_FILE="/var/run/secrets/kubernetes.io/serviceaccount/token"
 
 if [ x"$KUBERNETES_PORT_443_TCP_ADDR" != x"" ]; then
-    if [ -f $TOKEN_FILE ]; then
-        oc login $OC_CA_ARGS --token `cat $TOKEN_FILE` > /dev/null 2>&1
+    if [ -f $USER_TOKEN_FILE ]; then
+        oc login $OC_CA_ARGS --token `cat $USER_TOKEN_FILE` > /dev/null 2>&1
+    else
+        if [ x"$OPENSHIFT_USERNAME" != x"" -a x"$OPENSHIFT_PASSWORD" != x"" ]; then
+            oc login $OC_CA_ARGS -u "$OPENSHIFT_USERNAME" -p "$OPENSHIFT_PASSWORD" > /dev/null 2>&1
+            mkdir -p `dirname $USER_TOKEN_FILE`
+            oc whoami --show-token > $USER_TOKEN_FILE
+        else
+            if [ -f $ACCT_TOKEN_FILE ]; then
+                oc login $OC_CA_ARGS --token `cat $ACCT_TOKEN_FILE` > /dev/null 2>&1
+            fi
+        fi
     fi
 fi
 
