@@ -72,7 +72,7 @@ export ODO_VERSION
 # passed in a username/password to use to login. Finally, see if the
 # service account token has been mounted into the container.
 
-USER_TOKEN_FILE="/opt/app-root/src/.kube/token"
+USER_TOKEN_FILE="/var/run/workshop/token"
 ACCT_TOKEN_FILE="/var/run/secrets/kubernetes.io/serviceaccount/token"
 
 if [ x"$KUBERNETES_PORT_443_TCP_ADDR" != x"" ]; then
@@ -81,8 +81,9 @@ if [ x"$KUBERNETES_PORT_443_TCP_ADDR" != x"" ]; then
     else
         if [ x"$OPENSHIFT_USERNAME" != x"" -a x"$OPENSHIFT_PASSWORD" != x"" ]; then
             oc login $OC_CA_ARGS -u "$OPENSHIFT_USERNAME" -p "$OPENSHIFT_PASSWORD" > /dev/null 2>&1
-            mkdir -p `dirname $USER_TOKEN_FILE`
-            oc whoami --show-token > $USER_TOKEN_FILE
+            if [ -d `dirname $USER_TOKEN_FILE` ]; then
+                oc whoami --show-token > $USER_TOKEN_FILE
+            fi
         else
             if [ -f $ACCT_TOKEN_FILE ]; then
                 oc login $OC_CA_ARGS --token `cat $ACCT_TOKEN_FILE` > /dev/null 2>&1
