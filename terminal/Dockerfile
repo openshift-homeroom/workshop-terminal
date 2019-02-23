@@ -21,17 +21,25 @@ RUN HOME=/root && \
         httpd24-mod_ldap httpd24-mod_session atlas-devel gcc-gfortran \
         libffi-devel libtool-ltdl" && \
     yum install -y centos-release-scl && \
-    yum -y --setopt=tsflags=nodocs install --enablerepo=centosplus $INSTALL_PKGS && \
+    yum install -y --setopt=tsflags=nodocs --enablerepo=centosplus $INSTALL_PKGS && \
     rpm -V $INSTALL_PKGS && \
     # Remove centos-logos (httpd dependency) to keep image size smaller.
     rpm -e --nodeps centos-logos && \
+    yum -y clean all --enablerepo='*'
+
+RUN HOME=/root && \
+    INSTALL_PKGS="rh-ruby25 rh-ruby25-ruby-devel rh-ruby25-rubygem-rake \
+        rh-ruby25-rubygem-bundler" && \
+    yum install -y centos-release-scl && \
+    yum install -y --setopt=tsflags=nodocs --enablerepo=centosplus $INSTALL_PKGS && \
+    rpm -V $INSTALL_PKGS && \
     yum -y clean all --enablerepo='*'
 
 # Install Java JDK, Maven and Gradle.
 
 RUN HOME=/root && \
     INSTALL_PKGS="bc java-1.8.0-openjdk java-1.8.0-openjdk-devel" && \
-    yum install -y --enablerepo=centosplus $INSTALL_PKGS && \
+    yum install -y --setopt=tsflags=nodocs --enablerepo=centosplus $INSTALL_PKGS && \
     rpm -V $INSTALL_PKGS && \
     yum -y clean all --enablerepo='*'
 
