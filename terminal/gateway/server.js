@@ -231,7 +231,7 @@ async function get_openshift_admin_users() {
         if (rolebinding['roleRef']['name'] == 'admin') {
             for (var j=0; j<rolebinding['subjects'].length; j++) {
                 var subject = rolebinding['subjects'][j];
-                if (subject['kind'] == 'User') {
+                if (subject['kind'] == 'User' || subject['kind'] == 'SystemUser') {
                     users.push(subject['name']);
                 }
             }
