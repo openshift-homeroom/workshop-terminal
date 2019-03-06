@@ -189,12 +189,12 @@ async function verify_jupyterhub_user(access_token) {
 // using a service account with admin access on the project as it needs
 // to be able to query rolebindings for the project.
 
-var kubernetes_host = process.env.KUBERNETES_PORT_443_TCP_ADDR;
-var kubernetes_port = process.env.KUBERNETES_PORT_443_TCP_PORT;
+var kubernetes_service_host = process.env.KUBERNETES_SERVICE_HOST;
+var kubernetes_service_port = process.env.KUBERNETES_SERVICE_PORT;
 
-async function get_openshift_user_details(access_token) {
+async function get_openshift_user_details(server, access_token) {
     const options = {
-        baseURL: 'https://' + kubernetes_host + ':' + kubernetes_port,
+        baseURL: server,
         httpsAgent: new https.Agent({ rejectUnauthorized: false }),
         headers: { 'Authorization': 'Bearer ' + access_token },
         responseType: 'json'
@@ -208,12 +208,12 @@ async function get_openshift_user_details(access_token) {
     return name;
 }
 
-async function get_openshift_admin_users() {
+async function get_openshift_admin_users(server) {
     const namespace = project_name();
     const token = service_account_token();
 
     const options = {
-        baseURL: 'https://' + kubernetes_host + ':' + kubernetes_port,
+        baseURL: server,
         httpsAgent: new https.Agent({ rejectUnauthorized: false }),
         headers: { 'Authorization': 'Bearer ' + token },
         responseType: 'json'
@@ -231,7 +231,7 @@ async function get_openshift_admin_users() {
         if (rolebinding['roleRef']['name'] == 'admin') {
             for (var j=0; j<rolebinding['subjects'].length; j++) {
                 var subject = rolebinding['subjects'][j];
-                if (subject['kind'] == 'User') {
+                if (subject['kind'] == 'User' || subject['kind'] == 'SystemUser') {
                     users.push(subject['name']);
                 }
             }
@@ -241,12 +241,12 @@ async function get_openshift_admin_users() {
     return users;
 }
 
-async function verify_openshift_user(access_token) {
-    var users = await get_openshift_admin_users();
+async function verify_openshift_user(server, access_token) {
+    var users = await get_openshift_admin_users(server);
 
     logger.info('OpenShift admin users', {users:users});
 
-    var name = await get_openshift_user_details(access_token);
+    var name = await get_openshift_user_details(server, access_token);
 
     logger.info('OpenShift user name', {name:name});
 
@@ -424,7 +424,8 @@ async function install_jupyterhub_auth() {
 }
 
 async function install_openshift_auth() {
-    var server = 'https://openshift.default.svc.cluster.local';
+    var server = 'https://' + kubernetes_service_host + ':' + kubernetes_service_port;
+
     var client_id = service_account_name(oauth_service_account);
     var client_secret = service_account_token();
 
@@ -441,7 +442,8 @@ async function install_openshift_auth() {
 
     var same_origin = false;
 
-    register_oauth_callback(oauth2, verify_openshift_user, same_origin);
+    register_oauth_callback(oauth2, function(access_token) {
+        return verify_openshift_user(server, access_token); }, same_origin);
     register_oauth_handshake(oauth2, same_origin);
 }
 
