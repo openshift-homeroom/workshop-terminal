@@ -96,6 +96,7 @@ Alternatively, if you have uploaded the custom terminal image to an accessible i
 
 ```
 $ oc new-app https://raw.githubusercontent.com/openshift-labs/workshop-terminal/master/templates/production.json \
+  --param APPLICATION_NAME=myterminal \
   --param TERMINAL_IMAGE=quay.io/yourusername/youimagename:latest
 ```
 
@@ -118,7 +119,7 @@ USER 1001
 RUN /usr/libexec/s2i/assemble
 ```
 
-Add your additional steps within the section where the ``USER`` is ``root``.
+Add the additional steps which need to be run as ``root``, within the section where the ``USER`` is set to ``root``.
 
 Note that if installing anything into ``/opt/app-root`` from the ``Dockefile``, ensure that ownership of the files is changed to ``1001:0`` and the ``fix-permissions`` script is run on the ``/opt/app-root`` directory. These steps ensure that a user can still properly work with and edit the files which were added as ``root``.
 
@@ -139,3 +140,36 @@ For the images when doing a custom build, you can find a specific tagged version
 
 Customising deployment
 ----------------------
+
+The template used above is the recommended method for deploying the terminal. The template will do the following for you:
+
+* Ensure that a secure HTTPS connection is used when accessing the terminal from your web browser.
+* Enable authentication via the OpenShift cluster login page, with access to the terminal only granted to users who have ``admin`` role in the project.
+* Create a service account under which the terminal container will run, where the service account has ``admin`` access to the project, and you will be automatically logged into the OpenShift cluster.
+* Ensure that the ``Recreate`` deployment strategy is used so will only can have one terminal pod in existance when doing a restart.
+
+If you need to customise the deployment, such as to add persistent storage, the preferred path is to copy the template and modify it to suit your requirements, preserving the features above.
+
+If you choose not to use the template and deploy the terminal image directly, there will be no authentication protecting access to the terminal session. From the terminal session, you will also need to explicitly log into the OpenShift cluster you want to use using ``oc login``.
+
+With knowledge that there is no authentication protecting access, you can deploy the terminal image directly by running:
+
+```
+oc new-app quay.io/openshiftlabs/workshop-terminal:master --name terminal
+```
+
+To create a secure HTTPS route for accessing the terminal use:
+
+```
+oc create route edge --service terminal --insecure-policy Redirect
+```
+
+If you want to use simple authentication using HTTP Basic authentication, rather than link it to the OpenShift cluster user authentication, run:
+
+```
+oc set env dc/terminal AUTH_USERNAME=grumpy AUTH_PASSWORD=secret
+```
+
+or set the environment variables when using ``oc new-app`` to deploy the image.
+
+For authentication using the OpenShift cluster login page, refer to the template, as it requires additional resources to be created in order to work.
