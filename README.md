@@ -3,6 +3,8 @@ Workshop Terminal
 
 This repository contains software for deploying a containerised user environment in OpenShift, where users are provided access to the environment via a terminal in their web browser. It can be used to support workshops where users need access to command line clients and other tools when working with OpenShift, and you want to avoid needing to have users install anything on their own local computer.
 
+![](terminal.png)
+
 Command line clients, tools and software stacks which are included are:
 
 * Editors: ``vi``/``vim``, ``nano``.
