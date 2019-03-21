@@ -18,7 +18,7 @@ Quick start instructions
 If you don't want to read about how the user environment works, nor how they can be customised to include your own additional tools, in your OpenShift project, run:
 
 ```
-oc new-app https://raw.githubusercontent.com/openshift-labs/workshop-terminal/develop/templates/production.json
+oc new-app https://raw.githubusercontent.com/openshift-labs/workshop-terminal/master/templates/production.json
 ```
 
 This will deploy an instance of the user environment as a standalone deployment. The name of the deployment will by default be ``terminal``.
@@ -73,7 +73,7 @@ The first is that the image is Source-to-Image (S2I) enabled. The image can ther
 To create a custom image using S2I, run:
 
 ```
-oc new-build --name myterminal quay.io/openshiftlabs/workshop-terminal:latest~https://github.com/yourusername/yourrepo
+oc new-build --name myterminal quay.io/openshiftlabs/workshop-terminal:master~https://github.com/yourusername/yourrepo
 ```
 
 Anything in the Git repository will be copied into the ``/opt/app-root/src`` directory of the image.
@@ -93,14 +93,14 @@ oc tag myterminal:latest terminal:latest
 Alternatively, if you have uploaded the custom terminal image to an accessible image registry, you can create a fresh deployment using the template by running:
 
 ```
-$ oc new-app https://raw.githubusercontent.com/openshift-labs/workshop-terminal/develop/templates/production.json \
+$ oc new-app https://raw.githubusercontent.com/openshift-labs/workshop-terminal/master/templates/production.json \
   --param TERMINAL_IMAGE=quay.io/yourusername/youimagename:latest
 ```
 
 The alternative to using an S2I build, where you need to install additional system packages, is to use a ``Dockerfile`` build. In order to integrate properly with the terminal S2I builder mechanism for build and setup steps, it is recommended you use a ``Dockefile`` containing:
 
 ```
-FROM quay.io/openshiftlabs/workshop-terminal:latest
+FROM quay.io/openshiftlabs/workshop-terminal:master
 
 USER root
 
@@ -124,6 +124,16 @@ The resulting image created from the ``Dockerfile`` build would be used in the s
 
 Using versioned images
 ----------------------
+
+The URL for the template used above, is taken from the ``master`` branch of this Git repository. It is therefore bound to the most recent tagged version of the terminal image. Similarly, ``master`` was used as the tag when explaining custom builds.
+
+As the GitFlow branching model is used, although ``master`` is only updated when a tag is made, if you want to be certain that what version you are using doesn't change, you should use a specific tag.
+
+For the template, either make a copy of the template from ``master``, or go to GitHub, identify a specific tag, and use the URL to the template from that tag.
+
+For the images when doing a custom build, you can find a specific tagged version by going to:
+
+* https://quay.io/repository/openshiftlabs/workshop-terminal?tab=tags
 
 Customising deployment
 ----------------------
