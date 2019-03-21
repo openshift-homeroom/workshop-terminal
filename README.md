@@ -93,10 +93,11 @@ oc tag myterminal:latest terminal:latest
 Alternatively, if you have uploaded the custom terminal image to an accessible image registry, you can create a fresh deployment using the template by running:
 
 ```
-$ oc new-app https://raw.githubusercontent.com/openshift-labs/workshop-terminal/develop/templates/production.json --param TERMINAL_IMAGE=quay.io/yourusername/youimagename:latest
+$ oc new-app https://raw.githubusercontent.com/openshift-labs/workshop-terminal/develop/templates/production.json \
+  --param TERMINAL_IMAGE=quay.io/yourusername/youimagename:latest
 ```
 
-The alternative to using an S2I build, where you need to install additional system packages, is to use a ``Dockerfile`` build. In order to integrate properly with the S2I mechanism for provided build and setup steps, it is recommended you use a ``Dockefile`` containing:
+The alternative to using an S2I build, where you need to install additional system packages, is to use a ``Dockerfile`` build. In order to integrate properly with the terminal S2I builder mechanism for build and setup steps, it is recommended you use a ``Dockefile`` containing:
 
 ```
 FROM quay.io/openshiftlabs/workshop-terminal:latest
