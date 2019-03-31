@@ -1,1 +1,1 @@
-source scl_source enable $NODEJS_SCL
+source scl_source enable rh-nodejs8
