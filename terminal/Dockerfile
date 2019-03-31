@@ -122,7 +122,7 @@ COPY gateway /opt/workshop/gateway
 
 RUN HOME=/opt/workshop/gateway && \
     cd /opt/workshop/gateway && \
-    source scl_source enable rh-nodejs8 && \
+    source scl_source enable $NODEJS_SCL && \
     npm install --production && \
     chown -R 1001:0 /opt/workshop/gateway/node_modules && \
     fix-permissions /opt/workshop/gateway/node_modules
