@@ -27,6 +27,8 @@ RUN HOME=/root && \
     rpm -e --nodeps centos-logos && \
     yum -y clean all --enablerepo='*'
 
+# Install Ruby.
+
 RUN HOME=/root && \
     INSTALL_PKGS="rh-ruby25 rh-ruby25-ruby-devel rh-ruby25-rubygem-rake \
         rh-ruby25-rubygem-bundler" && \
@@ -55,6 +57,15 @@ RUN HOME=/root && \
     rm /tmp/gradle-5.0-bin.zip && \
     mv /usr/local/gradle-5.0 /usr/local/gradle && \
     ln -sf /usr/local/gradle/bin/gradle /usr/local/bin/gradle
+
+# Install NodeJS 8.0.
+
+RUN HOME=/root && \
+    INSTALL_PKGS="rh-nodejs8-npm" && \
+    yum install -y centos-release-scl && \
+    yum install -y --setopt=tsflags=nodocs --enablerepo=centosplus $INSTALL_PKGS && \
+    rpm -V $INSTALL_PKGS && \
+    yum -y clean all --enablerepo='*'
 
 # Install OpenShift clients.
 
