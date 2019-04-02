@@ -52,17 +52,6 @@ This means you cannot use this mechanism as a means of providing access to multi
 
 If you need to provide terminal sessions to multiple users, each user should create their own deployment for the terminal, or you should use the separate multi user [terminal spawner](https://github.com/openshift-labs/workshop-jupyterhub) application.
 
-Using persistent storage
-------------------------
-
-When working from the terminal, your home directory is ``/opt/app-root/src``. This directory is ephemeral. If the terminal instance is restarted, you will loose any files you have created and saved there.
-
-If you need persistent storage, you will need to claim a persistent volume and mount it against the deployment at a suitable directory.
-
-Note that if using the Python language runtime and installing additional Python packages, these are installed in a Python virtual environment located at ``/opt/app-root``. If the terminal instance is restarted, these would also be lost.
-
-For full persistence, it would be necessary to mount a persistent volume at ``/opt/app-root``, but you would need to use an init container, or some other mechanism to populate the persistent volume with the original contents of the ``/opt/app-root`` directory in the image, prior to then mounting the persistent volume on the ``/opt/app-root`` directory.
-
 Creating a custom image
 -----------------------
 
