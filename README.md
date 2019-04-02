@@ -17,7 +17,7 @@ For the language runtimes, commonly used packaging tools for working with that l
 Quick start instructions
 ------------------------
 
-If you don't want to read about how the user environment works, nor how they can be customised to include your own additional tools, in your OpenShift project, run:
+To quickly see what the terminal environment looks like, run:
 
 ```
 oc new-app https://raw.githubusercontent.com/openshift-labs/workshop-terminal/master/templates/production.json
