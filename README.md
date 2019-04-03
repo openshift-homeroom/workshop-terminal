@@ -50,7 +50,7 @@ Note that although this will provide you with a separate terminal session, it is
 
 This means you cannot use this mechanism as a means of providing access to multiple users. If you do and are using command line tools such as ``oc`` or ``kubectl``, the users will interfere with each other, as the terminal sessions share the same home directory.
 
-If you need to provide terminal sessions to multiple users, each user should create their own deployment for the terminal, or you should use the separate multi user [terminal spawner](https://github.com/openshift-labs/workshop-jupyterhub) application.
+If you need to provide terminal sessions to multiple users, each user should create their own deployment for the terminal, or you should use the separate multi user [terminal spawner](https://github.com/openshift-labs/workshop-spawner) application.
 
 Creating a custom image
 -----------------------
