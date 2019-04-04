@@ -8,4 +8,8 @@ else
     export PS1="[\w] $ "
 fi
 
+if [ x"$TERMINAL_HOME" != x"" ]; then
+    cd $TERMINAL_HOME
+fi
+
 exec /bin/bash "$@"
