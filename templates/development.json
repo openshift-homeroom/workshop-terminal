@@ -14,6 +14,10 @@
             "required": true
         },
         {
+            "name": "TERMINAL_ENVVARS",
+            "value": ""
+        },
+        {
             "name": "OC_VERSION",
             "value": ""
         },
@@ -120,6 +124,19 @@
             }
         },
         {
+            "kind": "ConfigMap",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "${APPLICATION_NAME}-env",
+                "labels": {
+                    "app": "${APPLICATION_NAME}"
+                }
+            },
+            "data": {
+                "terminal_envvars.sh": "${TERMINAL_ENVVARS}"
+            }
+        },
+        {
             "kind": "DeploymentConfig",
             "apiVersion": "v1",
             "metadata": {
@@ -182,7 +199,22 @@
                                         "name": "OAUTH_SERVICE_ACCOUNT",
                                         "value": "${APPLICATION_NAME}-user"
                                     }
+                                ],
+                                "volumeMounts": [
+                                    {
+                                        "mountPath": "/opt/app-root/envvars",
+                                        "name": "envvars"
+                                    }
                                 ]
+                            }
+                        ],
+                        "volumes": [
+                            {
+                                "name": "envvars",
+                                "configMap": {
+                                    "name": "${APPLICATION_NAME}-env",
+                                    "defaultMode": 420
+                                }
                             }
                         ]
                     }
