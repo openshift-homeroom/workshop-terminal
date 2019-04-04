@@ -15,7 +15,7 @@
         },
         {
             "name": "TERMINAL_IMAGE",
-            "value": "quay.io/openshiftlabs/workshop-terminal:2.6.0",
+            "value": "quay.io/openshiftlabs/workshop-terminal:2.6.1",
             "required": true
         },
         {
@@ -104,7 +104,7 @@
                 }
             },
             "data": {
-                "terminal_envvars.sh": "${TERMINAL_ENVVARS}"
+                "terminal.sh": "${TERMINAL_ENVVARS}"
             }
         },
         {
@@ -173,7 +173,7 @@
                                 ],
                                 "volumeMounts": [
                                     {
-                                        "mountPath": "/opt/app-root/envvars",
+                                        "mountPath": "/opt/workshop/envvars",
                                         "name": "envvars"
                                     }
                                 ]

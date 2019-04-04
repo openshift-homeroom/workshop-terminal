@@ -1,8 +1,14 @@
 #!/bin/bash
 
-if [ -f /opt/app-root/envvars/terminal_envvars.sh ]; then
+if [ -f /opt/workshop/envvars/terminal.sh ]; then
     set -a
-    . /opt/app-root/envvars/terminal_envvars.sh
+    . /opt/workshop/envvars/terminal.sh
+    set +a
+fi
+
+if [ -f /opt/app-root/envvars/terminal.sh ]; then
+    set -a
+    . /opt/app-root/envvars/terminal.sh
     set +a
 fi
 
