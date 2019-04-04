@@ -104,7 +104,7 @@
                 }
             },
             "data": {
-                "terminal_envvars.sh": "${TERMINAL_ENVVARS}"
+                "terminal.sh": "${TERMINAL_ENVVARS}"
             }
         },
         {
@@ -173,7 +173,7 @@
                                 ],
                                 "volumeMounts": [
                                     {
-                                        "mountPath": "/opt/app-root/envvars",
+                                        "mountPath": "/opt/workshop/envvars",
                                         "name": "envvars"
                                     }
                                 ]
