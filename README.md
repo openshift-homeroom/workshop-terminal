@@ -39,6 +39,12 @@ Note that you will only be granted access to the terminal if your are listed as 
 
 When you use the ``oc`` and ``kubectl`` command line tools from the terminal, you will already be logged into the cluster as a special service account user. You should have the same rights as a project admin for that project. If you need the full access rights of your original OpenShift user, run ``oc login`` and login as your actual user.
 
+To delete the deployment when done, run:
+
+```
+oc delete all,serviceaccount,rolebinding,configmap -l app=terminal
+```
+
 Creating multiple sessions
 --------------------------
 
