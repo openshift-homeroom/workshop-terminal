@@ -125,6 +125,7 @@ RUN HOME=/opt/workshop/butterfly && \
     source /opt/workshop/butterfly/bin/activate && \
     pip install --no-cache-dir -r requirements.txt && \
     /opt/workshop/butterfly/install-fonts.sh && \
+    /opt/workshop/butterfly/fixup-styles.sh && \
     rm /opt/app-root/etc/scl_enable
 
 # Install gateway application using SCL Node.js 8.
