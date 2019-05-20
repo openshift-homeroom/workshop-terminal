@@ -70,15 +70,15 @@ RUN HOME=/root && \
 # Install OpenShift clients.
 
 RUN curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v3/clients/3.10.113/linux/oc.tar.gz && \
-    tar -C /usr/local/bin -zxvf /tmp/oc.tar.gz oc && \
+    tar -C /usr/local/bin -zxf /tmp/oc.tar.gz oc && \
     mv /usr/local/bin/oc /usr/local/bin/oc-3.10.113 && \
     rm /tmp/oc.tar.gz && \
     curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v3/clients/3.11.83/linux/oc.tar.gz && \
-    tar -C /usr/local/bin -zxvf /tmp/oc.tar.gz oc && \
+    tar -C /usr/local/bin -zxf /tmp/oc.tar.gz oc && \
     mv /usr/local/bin/oc /usr/local/bin/oc-3.11.83 && \
     rm /tmp/oc.tar.gz && \
     curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v3/clients/4.0.0-0.171.0/linux/oc.tar.gz && \
-    tar -C /usr/local/bin -zxvf /tmp/oc.tar.gz oc && \
+    tar -C /usr/local/bin -zxf /tmp/oc.tar.gz oc && \
     mv /usr/local/bin/oc /usr/local/bin/oc-4.0.0-0.171.0 && \
     rm /tmp/oc.tar.gz
 
@@ -138,6 +138,17 @@ RUN HOME=/opt/workshop/gateway && \
     npm install --production && \
     chown -R 1001:0 /opt/workshop/gateway/node_modules && \
     fix-permissions /opt/workshop/gateway/node_modules
+
+# Install mod_wsgi-express for starting Apache with WebDAV.
+
+RUN HOME=/opt/workshop/webdav && \
+    mkdir /opt/workshop/webdav && \
+    cd /opt/workshop/gateway && \
+    source scl_source enable rh-python36 && \
+    source scl_source enable httpd24 && \
+    virtualenv /opt/workshop/webdav && \
+    source /opt/workshop/webdav/bin/activate && \
+    pip install mod_wsgi
 
 # Finish environment setup.
 
