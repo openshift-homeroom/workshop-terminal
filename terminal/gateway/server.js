@@ -33,7 +33,7 @@ app.set('trust proxy', true);
 // Short circuit WebDAV access as it handles its own authentication.
 
 app.use(uri_root_path + '/webdav/', proxy({
-    target: 'http://127.0.0.1:10083',
+    target: 'http://127.0.0.1:10084',
     ws: true
 }));
 
