@@ -1,6 +1,7 @@
 var express = require('express');
 var basic_auth = require('express-basic-auth')
 var session = require('express-session');
+var proxy = require('http-proxy-middleware');
 var uuid = require('uuid');
 var http = require('http');
 var https = require('https');
@@ -28,6 +29,13 @@ app.use(morgan(log_format));
 // In OpenShift we are always behind a proxy, so trust the headers sent.
 
 app.set('trust proxy', true);
+
+// Short circuit WebDAV access as it handles its own authentication.
+
+app.use(uri_root_path + '/webdav/', proxy({
+    target: 'http://127.0.0.1:10083',
+    ws: true
+}));
 
 // Enable use of a client session for the user. This is used to track
 // whether the user has logged in when using oauth. Session will expire

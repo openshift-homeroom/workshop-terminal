@@ -113,3 +113,20 @@ if [ x"$CLUSTER_SUBDOMAIN" = x"" ]; then
     CLUSTER_SUBDOMAIN=`echo $APPLICATION_HOST | sed -e 's/[a-z0-9-]*\.//'`
     export CLUSTER_SUBDOMAIN
 fi
+
+# Setup WebDAV configuration for when running Apache. Done here so that
+# environment variables are available to the terminal to add an account.
+
+WEBDAV_REALM=workshop
+WEBDAV_USERFILE=/opt/app-root/etc/webdav.htdigest
+
+export WEBDAV_REALM
+export WEBDAV_USERFILE
+
+if [ ! -s $WEBDAV_USERFILE ]; then
+    touch $WEBDAV_USERFILE
+    if [ x"$OPENSHIFT_USERNAME" != x"" -a x"$OPENSHIFT_PASSWORD" != x"" ]; then
+        DIGEST="$( printf "%s:%s:%s" "$OPENSHIFT_USERNAME" "$WEBDAV_REALM" "$OPENSHIFT_PASSWORD" | md5sum | awk '{print $1}' )"
+        printf "%s:%s:%s\n" "$OPENSHIFT_USERNAME" "$WEBDAV_REALM" "$DIGEST" >> $WEBDAV_USERFILE
+    fi
+fi
