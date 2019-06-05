@@ -528,7 +528,7 @@ function setup_routing() {
     set_default_page();
 
     install_routes(path.join(__dirname, 'routes'));
-    install_routes('/opt/workshop/gateway/routes');
+    install_routes('/opt/app-root/gateway/routes');
 }
 
 // Start the listener.

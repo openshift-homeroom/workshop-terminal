@@ -1,10 +1,11 @@
 #!/bin/bash
 
-OC_VERSION_3_10="3.10.113"
-OC_VERSION_3_11="3.11.83"
-OC_VERSION_4_0="4.0.0-0.171.0"
+OC_VERSION_3_10="3.10.145"
+OC_VERSION_3_11="3.11.115"
+OC_VERSION_4_0="4.0.22"
+OC_VERSION_4_1="4.1.0"
 
-OC_VERSION=${OC_VERSION:-$OC_VERSION_3_11}
+OC_VERSION=${OC_VERSION:-$OC_VERSION_4_1}
 
 case $OC_VERSION in
     $OC_VERSION_3_10)
@@ -22,8 +23,13 @@ case $OC_VERSION in
     4.0|4.0+|4.0.*)
         OC_VERSION=$OC_VERSION_4_0
         ;;
+    $OC_VERSION_4_1)
+        ;;
+    4.1|4.1+|4.1.*)
+        OC_VERSION=$OC_VERSION_4_1
+        ;;
     *)
-        OC_VERSION=$OC_VERSION_3_11
+        OC_VERSION=$OC_VERSION_4_1
         ;;
 esac
 

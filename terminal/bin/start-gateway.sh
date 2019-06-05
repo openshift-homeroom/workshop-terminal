@@ -25,4 +25,7 @@ fi
 
 cd /opt/workshop/gateway
 
+NODE_PATH=`pwd`/node_modules
+export NODE_PATH
+
 exec npm start
