@@ -161,7 +161,7 @@ COPY s2i/. /usr/libexec/s2i/
 COPY bin/. /opt/workshop/bin/
 COPY etc/. /opt/workshop/etc/
 
-RUN echo "auth required pam_wheel.so use_uid" >> /etc/pam.d/su && \
+RUN echo "auth requisite pam_deny.so" >> /etc/pam.d/su && \
     chmod g+w /etc/passwd
 
 RUN mkdir -p /opt/app-root/etc/init.d && \
