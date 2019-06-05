@@ -55,11 +55,14 @@ if [ -z "$OC_VERSION" ]; then
         1.12|1.12+)
             OC_VERSION=4.0
             ;;
+        1.13|1.13+)
+            OC_VERSION=4.1
+            ;;
     esac
 fi
 
 if [ -z "$ODO_VERSION" ]; then
-    ODO_VERSION=0.0.19
+    ODO_VERSION=0.0.20
 fi
 
 export OC_VERSION

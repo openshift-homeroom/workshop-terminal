@@ -69,17 +69,22 @@ RUN HOME=/root && \
 
 # Install OpenShift clients.
 
-RUN curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v3/clients/3.10.113/linux/oc.tar.gz && \
+RUN curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v3/clients/3.10.145/linux/oc.tar.gz && \
     tar -C /usr/local/bin -zxf /tmp/oc.tar.gz oc && \
-    mv /usr/local/bin/oc /usr/local/bin/oc-3.10.113 && \
+    mv /usr/local/bin/oc /usr/local/bin/oc-3.10.145 && \
     rm /tmp/oc.tar.gz && \
-    curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v3/clients/3.11.83/linux/oc.tar.gz && \
+    curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v3/clients/3.11.115/linux/oc.tar.gz && \
     tar -C /usr/local/bin -zxf /tmp/oc.tar.gz oc && \
-    mv /usr/local/bin/oc /usr/local/bin/oc-3.11.83 && \
+    mv /usr/local/bin/oc /usr/local/bin/oc-3.11.115 && \
     rm /tmp/oc.tar.gz && \
-    curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v3/clients/4.0.0-0.171.0/linux/oc.tar.gz && \
+    curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v3/clients/4.0.22/linux/oc.tar.gz && \
     tar -C /usr/local/bin -zxf /tmp/oc.tar.gz oc && \
-    mv /usr/local/bin/oc /usr/local/bin/oc-4.0.0-0.171.0 && \
+    mv /usr/local/bin/oc /usr/local/bin/oc-4.0.22 && \
+    rm /tmp/oc.tar.gz && \
+    curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.1.0/openshift-client-linux-4.1.0.tar.gz && \
+    tar -C /usr/local/bin -zxf /tmp/oc.tar.gz oc kubectl && \
+    mv /usr/local/bin/oc /usr/local/bin/oc-4.1.0 && \
+    mv /usr/local/bin/kubectl /usr/local/bin/kubectl-1.13.0 && \
     rm /tmp/oc.tar.gz
 
 RUN curl -sL -o /usr/local/bin/odo-0.0.16 https://github.com/redhat-developer/odo/releases/download/v0.0.16/odo-linux-amd64 && \
@@ -89,7 +94,9 @@ RUN curl -sL -o /usr/local/bin/odo-0.0.16 https://github.com/redhat-developer/od
     curl -sL -o /usr/local/bin/odo-0.0.18 https://github.com/redhat-developer/odo/releases/download/v0.0.18/odo-linux-amd64 && \
     chmod +x /usr/local/bin/odo-0.0.18 && \
     curl -sL -o /usr/local/bin/odo-0.0.19 https://github.com/redhat-developer/odo/releases/download/v0.0.19/odo-linux-amd64 && \
-    chmod +x /usr/local/bin/odo-0.0.19
+    chmod +x /usr/local/bin/odo-0.0.19 && \
+    curl -sL -o /usr/local/bin/odo-0.0.20 https://github.com/redhat-developer/odo/releases/download/v0.0.20/odo-linux-amd64 && \
+    chmod +x /usr/local/bin/odo-0.0.20
 
 # Install Kubernetes client.
 
