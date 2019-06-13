@@ -14,6 +14,18 @@
             "required": true
         },
         {
+            "name": "OPENSHIFT_USERNAME",
+            "value": ""
+        },
+        {
+            "name": "OPENSHIFT_PASSWORD",
+            "value": ""
+        },
+        {
+            "name": "OPENSHIFT_TOKEN",
+            "value": ""
+        },
+        {
             "name": "TERMINAL_ENVVARS",
             "value": ""
         },
@@ -198,6 +210,18 @@
                                     {
                                         "name": "OAUTH_SERVICE_ACCOUNT",
                                         "value": "${APPLICATION_NAME}-user"
+                                    },
+                                    {
+                                        "name": "OPENSHIFT_USERNAME",
+                                        "value": "${OPENSHIFT_USERNAME}"
+                                    },
+                                    {
+                                        "name": "OPENSHIFT_PASSWORD",
+                                        "value": "${OPENSHIFT_PASSWORD}"
+                                    },
+                                    {
+                                        "name": "OPENSHIFT_TOKEN",
+                                        "value": "${OPENSHIFT_TOKEN}"
                                     }
                                 ],
                                 "volumeMounts": [
