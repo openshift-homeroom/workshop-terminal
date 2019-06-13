@@ -6,7 +6,7 @@ USER root
 
 RUN HOME=/root && \
     INSTALL_PKGS="supervisor nano python-devel bash-completion \
-        bash-completion-extras cadaver" && \
+        bash-completion-extras cadaver jq" && \
     yum install -y centos-release-scl epel-release && \
     yum -y --setopt=tsflags=nodocs install --enablerepo=centosplus $INSTALL_PKGS && \
     rpm -V $INSTALL_PKGS && \
