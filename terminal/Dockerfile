@@ -6,7 +6,7 @@ USER root
 
 RUN HOME=/root && \
     INSTALL_PKGS="supervisor nano python-devel bash-completion \
-        bash-completion-extras cadaver jq" && \
+        bash-completion-extras cadaver jq sudo" && \
     yum install -y centos-release-scl epel-release && \
     yum -y --setopt=tsflags=nodocs install --enablerepo=centosplus $INSTALL_PKGS && \
     rpm -V $INSTALL_PKGS && \
@@ -169,6 +169,7 @@ COPY bin/. /opt/workshop/bin/
 COPY etc/. /opt/workshop/etc/
 
 RUN echo "auth requisite pam_deny.so" >> /etc/pam.d/su && \
+    sed -i.bak -e 's/^%wheel/# %wheel/' /etc/sudoers && \
     chmod g+w /etc/passwd
 
 RUN mkdir -p /opt/app-root/etc/init.d && \
