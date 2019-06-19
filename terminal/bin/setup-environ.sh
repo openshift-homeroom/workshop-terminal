@@ -70,24 +70,26 @@ export KUBECTL_VERSION
 export ODO_VERSION
 
 # Now attempt to login to the OpenShift cluster. First check whether we
-# inherited a user access token from the .kube directory via an emptydir
-# volume initialised from an init container. If not, see if we have been
-# passed in a username/password to use to login. Finally, see if the
-# service account token has been mounted into the container.
+# inherited a user access token from shared directory volume initialised
+# from an init container. If not, see if we have been passed in a user
+# access token or username/password via an environment to use to login.
+# Finally, see if the service account token has been mounted into the
+# container.
 
 TOKEN_DIRECTORY="/var/run/workshop"
 USER_TOKEN_FILE="$TOKEN_DIRECTORY/token"
 ACCT_TOKEN_FILE="/var/run/secrets/kubernetes.io/serviceaccount/token"
 
 if [ x"$KUBERNETES_PORT_443_TCP_ADDR" != x"" ]; then
-    if [ x"$OPENSHIFT_TOKEN" != x"" ]; then
-        oc login $OC_CA_ARGS --token "$OPENSHIFT_TOKEN" > /dev/null 2>&1
-        if [ -d $TOKEN_DIRECTORY ]; then
-            echo "$OPENSHIFT_TOKEN" > $USER_TOKEN_FILE
-        fi
+    if [ -f $USER_TOKEN_FILE ]; then
+        oc login $OC_CA_ARGS --token `cat $USER_TOKEN_FILE` > /dev/null 2>&1
     else
-        if [ -f $USER_TOKEN_FILE ]; then
-            oc login $OC_CA_ARGS --token `cat $USER_TOKEN_FILE` > /dev/null 2>&1
+        if [ x"$OPENSHIFT_TOKEN" != x"" ]; then
+            oc login $OC_CA_ARGS --token "$OPENSHIFT_TOKEN" > /dev/null 2>&1
+            if [ -d $TOKEN_DIRECTORY ]; then
+                echo "$OPENSHIFT_TOKEN" > $USER_TOKEN_FILE.$$
+                mv $USER_TOKEN_FILE.$$ $USER_TOKEN_FILE
+            fi
         else
             if [ x"$OPENSHIFT_USERNAME" != x"" -a x"$OPENSHIFT_PASSWORD" != x"" ]; then
                 oc login $OC_CA_ARGS -u "$OPENSHIFT_USERNAME" -p "$OPENSHIFT_PASSWORD" > /dev/null 2>&1
