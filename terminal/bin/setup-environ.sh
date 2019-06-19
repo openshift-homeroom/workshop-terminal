@@ -79,10 +79,6 @@ TOKEN_DIRECTORY="/var/run/workshop"
 USER_TOKEN_FILE="$TOKEN_DIRECTORY/token"
 ACCT_TOKEN_FILE="/var/run/secrets/kubernetes.io/serviceaccount/token"
 
-if [ -d $TOKEN_DIRECTORY ]; then
-    cp /opt/workshop/bin/start-console.sh $TOKEN_DIRECTORY
-fi
-
 if [ x"$KUBERNETES_PORT_443_TCP_ADDR" != x"" ]; then
     if [ x"$OPENSHIFT_TOKEN" != x"" ]; then
         oc login $OC_CA_ARGS --token "$OPENSHIFT_TOKEN" > /dev/null 2>&1
