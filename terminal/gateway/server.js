@@ -460,13 +460,13 @@ async function setup_access() {
         logger.info('Install JupyterHub auth support');
         await install_jupyterhub_auth();
     }
-    else if (oauth_service_account) {
-        logger.info('Install OpenShift auth support');
-        await install_openshift_auth();
-    }
     else if (auth_username) {
         logger.info('Install HTTP Basic auth support');
         await install_basic_auth();
+    }
+    else if (oauth_service_account) {
+        logger.info('Install OpenShift auth support');
+        await install_openshift_auth();
     }
 }
 
