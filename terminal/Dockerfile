@@ -6,7 +6,7 @@ USER root
 
 RUN HOME=/root && \
     INSTALL_PKGS="supervisor nano python-devel bash-completion \
-        bash-completion-extras cadaver jq sudo" && \
+        bash-completion-extras cadaver jq tmux sudo buildah podman" && \
     yum install -y centos-release-scl epel-release && \
     yum -y --setopt=tsflags=nodocs install --enablerepo=centosplus $INSTALL_PKGS && \
     rpm -V $INSTALL_PKGS && \
@@ -171,6 +171,15 @@ COPY etc/. /opt/workshop/etc/
 RUN echo "auth requisite pam_deny.so" >> /etc/pam.d/su && \
     sed -i.bak -e 's/^%wheel/# %wheel/' /etc/sudoers && \
     chmod g+w /etc/passwd
+
+RUN sed -i.bak -e 's/driver = "overlay"/driver = "vfs"/' \
+      /etc/containers/storage.conf
+
+COPY containers/libpod.conf /etc/containers/
+
+# COPY containers/sudoers.d/ /etc/sudoers.d/
+
+ENV BUILDAH_ISOLATION=chroot
 
 RUN mkdir -p /opt/app-root/etc/init.d && \
     mkdir -p /opt/app-root/etc/profile.d && \
