@@ -1,0 +1,1 @@
+%root ALL=(root) NOPASSWD:/usr/bin/podman
