@@ -44,13 +44,17 @@ if [ x"$KUBERNETES_PORT_443_TCP_ADDR" != x"" ]; then
     fi
 fi
 
+OPENSHIFT_IMAGE_REGISTRY="image-registry.openshift-image-registry.svc:5000"
+
 if [ -z "$OC_VERSION" ]; then
     case "$KUBECTL_VERSION" in
         1.10|1.10+)
             OC_VERSION=3.10
+            OPENSHIFT_IMAGE_REGISTRY="docker-registry.default.svc:5000"
             ;;
         1.11|1.11+)
             OC_VERSION=3.11
+            OPENSHIFT_IMAGE_REGISTRY="docker-registry.default.svc:5000"
             ;;
         1.12|1.12+)
             OC_VERSION=4.0
@@ -68,6 +72,8 @@ fi
 export OC_VERSION
 export KUBECTL_VERSION
 export ODO_VERSION
+
+export OPENSHIFT_IMAGE_REGISTRY
 
 # Now attempt to login to the OpenShift cluster. First check whether we
 # inherited a user access token from shared directory volume initialised

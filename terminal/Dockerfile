@@ -81,9 +81,9 @@ RUN curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v3/clie
     tar -C /usr/local/bin -zxf /tmp/oc.tar.gz oc && \
     mv /usr/local/bin/oc /usr/local/bin/oc-4.0.22 && \
     rm /tmp/oc.tar.gz && \
-    curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.1.0/openshift-client-linux-4.1.0.tar.gz && \
+    curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.1.7/openshift-client-linux-4.1.7.tar.gz && \
     tar -C /usr/local/bin -zxf /tmp/oc.tar.gz oc kubectl && \
-    mv /usr/local/bin/oc /usr/local/bin/oc-4.1.0 && \
+    mv /usr/local/bin/oc /usr/local/bin/oc-4.1.7 && \
     mv /usr/local/bin/kubectl /usr/local/bin/kubectl-1.13.0 && \
     rm /tmp/oc.tar.gz
 
@@ -168,6 +168,8 @@ COPY s2i/. /usr/libexec/s2i/
 COPY bin/. /opt/workshop/bin/
 COPY etc/. /opt/workshop/etc/
 
+COPY bin/start-singleuser.sh /opt/app-root/bin/
+
 RUN echo "auth requisite pam_deny.so" >> /etc/pam.d/su && \
     sed -i.bak -e 's/^%wheel/# %wheel/' /etc/sudoers && \
     chmod g+w /etc/passwd
@@ -177,7 +179,7 @@ RUN sed -i.bak -e 's/driver = "overlay"/driver = "vfs"/' \
 
 RUN sed -i.bak \
       -e "/\[registries.search\]/{N;s/registries = \[.*\]/registries = ['docker.io', 'registry.fedoraproject.org', 'quay.io', 'registry.centos.org']/}" \
-      -e "/\[registries.insecure\]/{N;s/registries = \[.*\]/registries = ['docker-registry.default.svc:5000']/}" \
+      -e "/\[registries.insecure\]/{N;s/registries = \[.*\]/registries = ['docker-registry.default.svc:5000','image-registry.openshift-image-registry.svc:5000']/}" \
       /etc/containers/registries.conf
 
 COPY containers/libpod.conf /etc/containers/
