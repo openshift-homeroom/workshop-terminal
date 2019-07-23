@@ -179,7 +179,7 @@ RUN sed -i.bak -e 's/driver = "overlay"/driver = "vfs"/' \
 
 RUN sed -i.bak \
       -e "/\[registries.search\]/{N;s/registries = \[.*\]/registries = ['docker.io', 'registry.fedoraproject.org', 'quay.io', 'registry.centos.org']/}" \
-      -e "/\[registries.insecure\]/{N;s/registries = \[.*\]/registries = ['docker-registry.default.svc:5000']/}" \
+      -e "/\[registries.insecure\]/{N;s/registries = \[.*\]/registries = ['docker-registry.default.svc:5000','image-registry.openshift-image-registry.svc:5000']/}" \
       /etc/containers/registries.conf
 
 COPY containers/libpod.conf /etc/containers/
