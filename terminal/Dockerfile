@@ -168,6 +168,8 @@ COPY s2i/. /usr/libexec/s2i/
 COPY bin/. /opt/workshop/bin/
 COPY etc/. /opt/workshop/etc/
 
+COPY bin/start-singleuser.sh /opt/app-root/bin/
+
 RUN echo "auth requisite pam_deny.so" >> /etc/pam.d/su && \
     sed -i.bak -e 's/^%wheel/# %wheel/' /etc/sudoers && \
     chmod g+w /etc/passwd
