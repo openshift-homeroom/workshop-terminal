@@ -201,6 +201,7 @@ RUN source scl_source enable rh-python36 && \
     virtualenv /opt/app-root && \
     source /opt/app-root/bin/activate && \
     pip install -U pip setuptools wheel && \
+    pip install ansible==2.8.2 openshift==0.9.0 jmespath==0.9.4 && \
     ln -s /opt/workshop/bin/oc /opt/app-root/bin/oc && \
     ln -s /opt/workshop/bin/odo /opt/app-root/bin/odo && \
     ln -s /opt/workshop/bin/kubectl /opt/app-root/bin/kubectl && \
