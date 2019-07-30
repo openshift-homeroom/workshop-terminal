@@ -12,6 +12,8 @@ var fs = require('fs');
 var morgan = require('morgan')
 var logger = require('./logger');
 
+var enable_webdav = process.env.ENABLE_WEBDAV;
+
 // Setup the root application. Everything will actually be under a
 // mount point corresponding to the specific user. This is added in
 // each of the routes when defined.
@@ -32,10 +34,12 @@ app.set('trust proxy', true);
 
 // Short circuit WebDAV access as it handles its own authentication.
 
-app.use(uri_root_path + '/webdav/', proxy({
-    target: 'http://127.0.0.1:10084',
-    ws: true
-}));
+if (enable_webdav == 'true') {
+    app.use(uri_root_path + '/webdav/', proxy({
+        target: 'http://127.0.0.1:10084',
+        ws: true
+    }));
+}
 
 // Enable use of a client session for the user. This is used to track
 // whether the user has logged in when using oauth. Session will expire
