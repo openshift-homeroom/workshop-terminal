@@ -5,12 +5,12 @@ USER root
 # Install additional common utilities.
 
 RUN HOME=/root && \
-    INSTALL_PKGS="supervisor nano python-devel bash-completion \
+    INSTALL_PKGS="nano python-devel python-pip bash-completion \
         bash-completion-extras cadaver jq tmux sudo buildah podman" && \
     yum install -y centos-release-scl epel-release && \
     yum -y --setopt=tsflags=nodocs install --enablerepo=centosplus $INSTALL_PKGS && \
-    rpm -V $INSTALL_PKGS && \
-    yum -y clean all --enablerepo='*'
+    yum -y clean all --enablerepo='*' && \
+    pip install --no-cache-dir supervisor==4.0.4
 
 # Install Python.
 
@@ -209,6 +209,8 @@ RUN source scl_source enable rh-python36 && \
     fix-permissions /opt/app-root -P
 
 COPY profiles/. /opt/workshop/etc/profile.d/
+
+RUN ln -s /opt/workshop/etc/supervisord.conf /etc/supervisord.conf
 
 LABEL io.k8s.display-name="Terminal" \
       io.openshift.expose-services="10080:http" \
