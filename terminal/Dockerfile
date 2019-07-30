@@ -210,6 +210,8 @@ RUN source scl_source enable rh-python36 && \
 
 COPY profiles/. /opt/workshop/etc/profile.d/
 
+RUN ln -s /opt/workshop/etc/supervisord.conf /etc/supervisord.conf
+
 LABEL io.k8s.display-name="Terminal" \
       io.openshift.expose-services="10080:http" \
       io.openshift.tags="builder,butterfly" \
