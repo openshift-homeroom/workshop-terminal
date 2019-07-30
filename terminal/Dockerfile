@@ -5,12 +5,12 @@ USER root
 # Install additional common utilities.
 
 RUN HOME=/root && \
-    INSTALL_PKGS="supervisor nano python-devel bash-completion \
+    INSTALL_PKGS="nano python-devel python-pip bash-completion \
         bash-completion-extras cadaver jq tmux sudo buildah podman" && \
     yum install -y centos-release-scl epel-release && \
     yum -y --setopt=tsflags=nodocs install --enablerepo=centosplus $INSTALL_PKGS && \
-    rpm -V $INSTALL_PKGS && \
-    yum -y clean all --enablerepo='*'
+    yum -y clean all --enablerepo='*' && \
+    pip install --no-cache-dir supervisor==4.0.4
 
 # Install Python.
 
