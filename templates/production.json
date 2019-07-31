@@ -4,7 +4,7 @@
     "metadata": {
         "name": "workshop-terminal-production",
         "annotations": {
-            "openshift.io/display-name": "Workshop Terminal (production)"
+            "openshift.io/display-name": "Workshop Terminal (Production)"
         }
     },
     "parameters": [
