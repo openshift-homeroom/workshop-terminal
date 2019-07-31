@@ -10,7 +10,7 @@ RUN HOME=/root && \
     yum install -y centos-release-scl epel-release && \
     yum -y --setopt=tsflags=nodocs install --enablerepo=centosplus $INSTALL_PKGS && \
     yum -y clean all --enablerepo='*' && \
-    pip install --no-cache-dir supervisor==4.0.4
+    pip install --no-cache-dir supervisor==4.0.4 mercurial==5.0.2
 
 # Install Python.
 
