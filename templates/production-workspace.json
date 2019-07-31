@@ -2,21 +2,25 @@
     "kind": "Template",
     "apiVersion": "v1",
     "metadata": {
-        "name": "workshop-terminal-production",
+        "name": "workshop-terminal-production-workspace",
         "annotations": {
-            "openshift.io/display-name": "Workshop Terminal (Production)"
+            "openshift.io/display-name": "Workshop Terminal (Production/Workspace)"
         }
     },
     "parameters": [
         {
             "name": "APPLICATION_NAME",
-            "value": "terminal",
+            "value": "workspace",
             "required": true
         },
         {
             "name": "TERMINAL_IMAGE",
             "value": "quay.io/openshiftlabs/workshop-terminal:2.12.2",
             "required": true
+        },
+        {
+            "name": "VOLUME_SIZE",
+            "value": "1Gi"
         },
         {
             "name": "AUTH_USERNAME",
@@ -150,6 +154,7 @@
                         "imageChangeParams": {
                             "automatic": true,
                             "containerNames": [
+                                "setup-volume",
                                 "terminal"
                             ],
                             "from": {
@@ -173,9 +178,27 @@
                     },
                     "spec": {
                         "serviceAccountName": "${APPLICATION_NAME}-user",
+                        "initContainers": [
+                            {
+                                "name": "setup-volume",
+                                "image": "${APPLICATION_NAME}:latest",
+                                "command": [
+                                    "/opt/workshop/bin/setup-volume.sh",
+                                    "/opt/app-root",
+                                    "/mnt/workspace"
+                                ],
+                                "volumeMounts": [
+                                    {
+                                        "name": "data",
+                                        "mountPath": "/mnt"
+                                    }
+                                ]
+                            }
+                        ],
                         "containers": [
                             {
                                 "name": "terminal",
+                                "image": "${APPLICATION_NAME}:latest",
                                 "ports": [
                                     {
                                         "containerPort": 10080,
@@ -216,6 +239,11 @@
                                     {
                                         "mountPath": "/opt/workshop/envvars",
                                         "name": "envvars"
+                                    },
+                                    {
+                                        "name": "data",
+                                        "mountPath": "/opt/app-root",
+                                        "subPath": "workspace"
                                     }
                                 ]
                             }
@@ -226,6 +254,12 @@
                                 "configMap": {
                                     "name": "${APPLICATION_NAME}-env",
                                     "defaultMode": 420
+                                }
+                            },
+                            {
+                                "name": "data",
+                                "persistentVolumeClaim": {
+                                    "claimName": "${APPLICATION_NAME}-data"
                                 }
                             }
                         ]
@@ -279,6 +313,26 @@
                 "tls": {
                     "termination": "edge",
                     "insecureEdgeTerminationPolicy": "Redirect"
+                }
+            }
+        },
+        {
+            "kind": "PersistentVolumeClaim",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "${APPLICATION_NAME}-data",
+                "labels": {
+                    "app": "${APPLICATION_NAME}"
+                }
+            },
+            "spec": {
+                "accessModes": [
+                    "ReadWriteOnce"
+                ],
+                "resources": {
+                    "requests": {
+                        "storage": "${VOLUME_SIZE}"
+                    }
                 }
             }
         }
