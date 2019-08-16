@@ -465,8 +465,13 @@ async function setup_access() {
         await install_jupyterhub_auth();
     }
     else if (auth_username) {
-        logger.info('Install HTTP Basic auth support');
-        await install_basic_auth();
+        if (auth_username != '*') {
+            logger.info('Install HTTP Basic auth support');
+            await install_basic_auth();
+        }
+        else {
+            logger.info('All authentication has been disabled');
+        }
     }
     else if (oauth_service_account) {
         logger.info('Install OpenShift auth support');
