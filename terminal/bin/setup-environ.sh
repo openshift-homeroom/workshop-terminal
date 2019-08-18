@@ -113,10 +113,12 @@ fi
 
 # If we have been supplied the name of a OpenShift project to use, change
 # to that specific project, rather than rely on default selected, and try
-# and create the project if it doesn't exist.
+# and create the project if it doesn't exist. We need to override the
+# project namespace environment variable in this situation.
 
 if [ x"$OPENSHIFT_PROJECT" != x"" ]; then
     oc project "$OPENSHIFT_PROJECT" || oc new-project "$OPENSHIFT_PROJECT" > /dev/null 2>&1
+    export PROJECT_NAMESPACE=$OPENSHIFT_PROJECT
 fi
 
 # If the host used in cluster subdomain for applications is not defined
