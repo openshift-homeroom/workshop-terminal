@@ -10,7 +10,7 @@ Command line clients, tools and software stacks which are included are:
 * Editors: ``vi``/``vim``, ``nano``.
 * Kubernetes clients: ``kubectl``
 * OpenShift clients: ``oc``, ``odo``.
-* Language runtimes: ``java``, ``node.js``, ``python``, ``ruby``.
+* Language runtimes: ``java``, ``node.js``, ``python``
 
 For the language runtimes, commonly used packaging tools for working with that language are also included.
 
