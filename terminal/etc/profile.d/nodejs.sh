@@ -1,1 +1,1 @@
-source scl_source enable rh-nodejs8
+source scl_source enable rh-nodejs10
