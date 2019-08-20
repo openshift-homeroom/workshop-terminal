@@ -122,7 +122,7 @@
                 "source": {
                     "type": "Git",
                     "git": {
-                        "uri": "https://github.com/openshift-labs/workshop-terminal.git",
+                        "uri": "https://github.com/openshift-homeroom/workshop-terminal.git",
                         "ref": "develop"
                     },
                     "contextDir": "terminal"
