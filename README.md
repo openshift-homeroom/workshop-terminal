@@ -20,7 +20,7 @@ Quick start instructions
 To quickly see what the terminal environment looks like, run:
 
 ```
-oc new-app https://raw.githubusercontent.com/openshift-labs/workshop-terminal/master/templates/production.json
+oc new-app https://raw.githubusercontent.com/openshift-homeroom/workshop-terminal/master/templates/production.json
 ```
 
 This will deploy an instance of the user environment as a standalone deployment. The name of the deployment will by default be ``terminal``.
@@ -90,7 +90,7 @@ oc tag myterminal:latest terminal:latest
 Alternatively, if you have uploaded the custom terminal image to an accessible image registry, you can create a fresh deployment using the template by running:
 
 ```
-$ oc new-app https://raw.githubusercontent.com/openshift-labs/workshop-terminal/master/templates/production.json \
+$ oc new-app https://raw.githubusercontent.com/openshift-homeroom/workshop-terminal/master/templates/production.json \
   --param APPLICATION_NAME=myterminal \
   --param TERMINAL_IMAGE=quay.io/yourusername/youimagename:latest
 ```
