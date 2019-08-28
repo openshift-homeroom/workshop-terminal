@@ -1,5 +1,5 @@
 {
-  "name": "gateway",
+  "name": "workshop-gateway",
   "version": "1.0.0",
   "description": "",
   "scripts": {
@@ -15,6 +15,7 @@
     "uuid": "3.3.2",
     "pug": "2.0.3",
     "morgan": "1.9.1",
-    "winston": "3.2.0"
+    "winston": "3.2.0",
+    "axios-retry": "3.1.2"
   }
 }
