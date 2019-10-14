@@ -36,16 +36,16 @@ RUN HOME=/root && \
     yum -y clean all --enablerepo='*'
 
 RUN HOME=/root && \
-    (curl -s -0 http://www.us.apache.org/dist/maven/maven-3/3.6.0/binaries/apache-maven-3.6.0-bin.tar.gz | \
+    (curl -s -0 http://www.us.apache.org/dist/maven/maven-3/3.6.2/binaries/apache-maven-3.6.2-bin.tar.gz | \
     tar -zx -C /usr/local) && \
-    mv /usr/local/apache-maven-3.6.0 /usr/local/maven && \
+    mv /usr/local/apache-maven-3.6.2 /usr/local/maven && \
     ln -sf /usr/local/maven/bin/mvn /usr/local/bin/mvn
 
 RUN HOME=/root && \
-    curl -sL -0 https://services.gradle.org/distributions/gradle-5.0-bin.zip -o /tmp/gradle-5.0-bin.zip && \
-    unzip /tmp/gradle-5.0-bin.zip -d /usr/local/ && \
-    rm /tmp/gradle-5.0-bin.zip && \
-    mv /usr/local/gradle-5.0 /usr/local/gradle && \
+    curl -sL -0 https://services.gradle.org/distributions/gradle-5.6.2-bin.zip -o /tmp/gradle-5.6.2-bin.zip && \
+    unzip /tmp/gradle-5.6.2-bin.zip -d /usr/local/ && \
+    rm /tmp/gradle-5.6.2-bin.zip && \
+    mv /usr/local/gradle-5.6.2 /usr/local/gradle && \
     ln -sf /usr/local/gradle/bin/gradle /usr/local/bin/gradle
 
 # Install OpenShift clients.
