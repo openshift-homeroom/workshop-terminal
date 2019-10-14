@@ -3,7 +3,9 @@
 OC_VERSION_3_10="3.10.145"
 OC_VERSION_3_11="3.11.115"
 OC_VERSION_4_0="4.0.22"
-OC_VERSION_4_1="4.1.7"
+OC_VERSION_4_1="4.1"
+OC_VERSION_4_2="4.2"
+OC_VERSION_4_3="4.3"
 
 OC_VERSION=${OC_VERSION:-$OC_VERSION_4_1}
 
@@ -28,8 +30,18 @@ case $OC_VERSION in
     4.1|4.1+|4.1.*)
         OC_VERSION=$OC_VERSION_4_1
         ;;
+    $OC_VERSION_4_2)
+        ;;
+    4.2|4.2+|4.2.*)
+        OC_VERSION=$OC_VERSION_4_2
+        ;;
+    $OC_VERSION_4_3)
+        ;;
+    4.3|4.3+|4.3.*)
+        OC_VERSION=$OC_VERSION_4_3
+        ;;
     *)
-        OC_VERSION=$OC_VERSION_4_1
+        OC_VERSION=$OC_VERSION_4_3
         ;;
 esac
 

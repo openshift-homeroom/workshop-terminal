@@ -50,22 +50,32 @@ RUN HOME=/root && \
 
 # Install OpenShift clients.
 
-RUN curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v3/clients/3.10.145/linux/oc.tar.gz && \
+RUN curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v3/clients/3.10.176/linux/oc.tar.gz && \
     tar -C /usr/local/bin -zxf /tmp/oc.tar.gz oc && \
-    mv /usr/local/bin/oc /usr/local/bin/oc-3.10.145 && \
+    mv /usr/local/bin/oc /usr/local/bin/oc-3.10.176 && \
     rm /tmp/oc.tar.gz && \
-    curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v3/clients/3.11.115/linux/oc.tar.gz && \
+    curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v3/clients/3.11.153/linux/oc.tar.gz && \
     tar -C /usr/local/bin -zxf /tmp/oc.tar.gz oc && \
-    mv /usr/local/bin/oc /usr/local/bin/oc-3.11.115 && \
+    mv /usr/local/bin/oc /usr/local/bin/oc-3.11.153 && \
     rm /tmp/oc.tar.gz && \
     curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v3/clients/4.0.22/linux/oc.tar.gz && \
     tar -C /usr/local/bin -zxf /tmp/oc.tar.gz oc && \
     mv /usr/local/bin/oc /usr/local/bin/oc-4.0.22 && \
     rm /tmp/oc.tar.gz && \
-    curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.1.7/openshift-client-linux-4.1.7.tar.gz && \
-    tar -C /usr/local/bin -zxf /tmp/oc.tar.gz oc kubectl && \
-    mv /usr/local/bin/oc /usr/local/bin/oc-4.1.7 && \
-    mv /usr/local/bin/kubectl /usr/local/bin/kubectl-1.13.0 && \
+    curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/oc/4.1/linux/oc.tar.gz && \
+    tar -C /usr/local/bin -zxf /tmp/oc.tar.gz oc && \
+    mv /usr/local/bin/oc /usr/local/bin/oc-4.1 && \
+    ln -s /usr/local/bin/oc-4.1 /usr/local/bin/kubectl-1.13 && \
+    rm /tmp/oc.tar.gz && \
+    curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/oc/4.2/linux/oc.tar.gz && \
+    tar -C /usr/local/bin -zxf /tmp/oc.tar.gz oc && \
+    mv /usr/local/bin/oc /usr/local/bin/oc-4.2 && \
+    ln -s /usr/local/bin/oc-4.2 /usr/local/bin/kubectl-1.14 && \
+    rm /tmp/oc.tar.gz && \
+    curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/oc/4.3/linux/oc.tar.gz && \
+    tar -C /usr/local/bin -zxf /tmp/oc.tar.gz oc && \
+    mv /usr/local/bin/oc /usr/local/bin/oc-4.3 && \
+    ln -s /usr/local/bin/oc-4.3 /usr/local/bin/kubectl-1.16 && \
     rm /tmp/oc.tar.gz
 
 RUN curl -sL -o /usr/local/bin/odo-0.0.16 https://github.com/openshift/odo/releases/download/v0.0.16/odo-linux-amd64 && \
