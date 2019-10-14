@@ -4,12 +4,12 @@ unset BASH_ENV PROMPT_COMMAND ENV
 
 for i in /opt/workshop/etc/profile.d/*.sh /opt/workshop/etc/profile.d/sh.local; do
     if [ -r "$i" ]; then
-	. "$i" >/dev/null
+        . "$i" >/dev/null
     fi
 done
 
 for i in /opt/app-root/etc/profile.d/*.sh /opt/app-root/etc/profile.d/sh.local; do
     if [ -r "$i" ]; then
-	. "$i" >/dev/null
+        . "$i" >/dev/null
     fi
 done
