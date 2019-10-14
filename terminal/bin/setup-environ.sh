@@ -65,9 +65,6 @@ if [ -z "$OC_VERSION" ]; then
         1.14|1.14+)
             OC_VERSION=4.2
             ;;
-        1.15|1.15+)
-            OC_VERSION=4.3
-            ;;
         1.16|1.16+)
             OC_VERSION=4.3
             ;;

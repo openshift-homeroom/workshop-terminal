@@ -52,15 +52,15 @@ RUN HOME=/root && \
 
 RUN curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v3/clients/3.10.176/linux/oc.tar.gz && \
     tar -C /usr/local/bin -zxf /tmp/oc.tar.gz oc && \
-    mv /usr/local/bin/oc /usr/local/bin/oc-3.10.176 && \
+    mv /usr/local/bin/oc /usr/local/bin/oc-3.10 && \
     rm /tmp/oc.tar.gz && \
     curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v3/clients/3.11.153/linux/oc.tar.gz && \
     tar -C /usr/local/bin -zxf /tmp/oc.tar.gz oc && \
-    mv /usr/local/bin/oc /usr/local/bin/oc-3.11.153 && \
+    mv /usr/local/bin/oc /usr/local/bin/oc-3.11 && \
     rm /tmp/oc.tar.gz && \
     curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v3/clients/4.0.22/linux/oc.tar.gz && \
     tar -C /usr/local/bin -zxf /tmp/oc.tar.gz oc && \
-    mv /usr/local/bin/oc /usr/local/bin/oc-4.0.22 && \
+    mv /usr/local/bin/oc /usr/local/bin/oc-4.0 && \
     rm /tmp/oc.tar.gz && \
     curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/oc/4.1/linux/oc.tar.gz && \
     tar -C /usr/local/bin -zxf /tmp/oc.tar.gz oc && \
@@ -92,14 +92,14 @@ RUN curl -sL -o /usr/local/bin/odo-0.0.16 https://github.com/openshift/odo/relea
 # Install Kubernetes client.
 
 RUN curl -sL -o /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.10.0/bin/linux/amd64/kubectl && \
-    mv /usr/local/bin/kubectl /usr/local/bin/kubectl-1.10.0 && \
-    chmod +x /usr/local/bin/kubectl-1.10.0 && \
+    mv /usr/local/bin/kubectl /usr/local/bin/kubectl-1.10 && \
+    chmod +x /usr/local/bin/kubectl-1.10 && \
     curl -sL -o /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.11.0/bin/linux/amd64/kubectl && \
-    mv /usr/local/bin/kubectl /usr/local/bin/kubectl-1.11.0 && \
-    chmod +x /usr/local/bin/kubectl-1.11.0 && \
+    mv /usr/local/bin/kubectl /usr/local/bin/kubectl-1.11 && \
+    chmod +x /usr/local/bin/kubectl-1.11 && \
     curl -sL -o /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.12.0/bin/linux/amd64/kubectl && \
-    mv /usr/local/bin/kubectl /usr/local/bin/kubectl-1.12.0 && \
-    chmod +x /usr/local/bin/kubectl-1.12.0
+    mv /usr/local/bin/kubectl /usr/local/bin/kubectl-1.12 && \
+    chmod +x /usr/local/bin/kubectl-1.12
 
 # Common environment variables.
 
