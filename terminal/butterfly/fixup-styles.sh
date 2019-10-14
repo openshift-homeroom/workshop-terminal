@@ -2,7 +2,7 @@
 
 VERSION=`python -c 'import sys; print(".".join(map(str,sys.version_info[:2])))'`
 
-FILENAME=/opt/workshop/butterfly/lib/python$PY_VERSION/site-packages/butterfly/static/main.css
+FILENAME=/opt/workshop/butterfly/lib/python$VERSION/site-packages/butterfly/static/main.css
 
 cat << EOF >> $FILENAME
 
