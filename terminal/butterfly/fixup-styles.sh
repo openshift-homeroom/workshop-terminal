@@ -1,6 +1,10 @@
 #!/bin/bash
 
-cat << EOF >> /opt/workshop/butterfly/lib/python2.7/site-packages/butterfly/static/main.css
+VERSION=`python -c 'import sys; print(".".join(map(str,sys.version_info[:2])))'`
+
+FILENAME=/opt/workshop/butterfly/lib/python$PY_VERSION/site-packages/butterfly/static/main.css
+
+cat << EOF >> $FILENAME
 
 @supports (-webkit-overflow-scrolling: touch) {
     html, body {
