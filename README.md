@@ -70,7 +70,7 @@ The first is that the image is Source-to-Image (S2I) enabled. The image can ther
 To create a custom image using S2I, run:
 
 ```
-oc new-build --name myterminal quay.io/openshiftlabs/workshop-terminal:master~https://github.com/yourusername/yourrepo
+oc new-build --name myterminal quay.io/openshifthomeroom/workshop-terminal:master~https://github.com/yourusername/yourrepo
 ```
 
 Anything in the Git repository will be copied into the ``/opt/app-root/src`` directory of the image.
@@ -98,7 +98,7 @@ $ oc new-app https://raw.githubusercontent.com/openshift-homeroom/workshop-termi
 The alternative to using an S2I build, where you need to install additional system packages, is to use a ``Dockerfile`` build. In order to integrate properly with the terminal S2I builder mechanism for build and setup steps, it is recommended you use a ``Dockefile`` containing:
 
 ```
-FROM quay.io/openshiftlabs/workshop-terminal:master
+FROM quay.io/openshifthomeroom/workshop-terminal:master
 
 USER root
 
@@ -131,7 +131,7 @@ For the template, either make a copy of the template from ``master``, or go to G
 
 For the images when doing a custom build, you can find a specific tagged version by going to:
 
-* https://quay.io/repository/openshiftlabs/workshop-terminal?tab=tags
+* https://quay.io/repository/openshifthomeroom/workshop-terminal?tab=tags
 
 Customising deployment
 ----------------------
@@ -150,7 +150,7 @@ If you choose not to use the template and deploy the terminal image directly, th
 With knowledge that there is no authentication protecting access, you can deploy the terminal image directly by running:
 
 ```
-oc new-app quay.io/openshiftlabs/workshop-terminal:master --name terminal
+oc new-app quay.io/openshifthomeroom/workshop-terminal:master --name terminal
 ```
 
 To create a secure HTTPS route for accessing the terminal use:

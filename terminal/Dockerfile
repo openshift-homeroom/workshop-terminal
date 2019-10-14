@@ -36,60 +36,70 @@ RUN HOME=/root && \
     yum -y clean all --enablerepo='*'
 
 RUN HOME=/root && \
-    (curl -s -0 http://www.us.apache.org/dist/maven/maven-3/3.6.0/binaries/apache-maven-3.6.0-bin.tar.gz | \
+    (curl -s -0 http://www.us.apache.org/dist/maven/maven-3/3.6.2/binaries/apache-maven-3.6.2-bin.tar.gz | \
     tar -zx -C /usr/local) && \
-    mv /usr/local/apache-maven-3.6.0 /usr/local/maven && \
+    mv /usr/local/apache-maven-3.6.2 /usr/local/maven && \
     ln -sf /usr/local/maven/bin/mvn /usr/local/bin/mvn
 
 RUN HOME=/root && \
-    curl -sL -0 https://services.gradle.org/distributions/gradle-5.0-bin.zip -o /tmp/gradle-5.0-bin.zip && \
-    unzip /tmp/gradle-5.0-bin.zip -d /usr/local/ && \
-    rm /tmp/gradle-5.0-bin.zip && \
-    mv /usr/local/gradle-5.0 /usr/local/gradle && \
+    curl -sL -0 https://services.gradle.org/distributions/gradle-5.6.2-bin.zip -o /tmp/gradle-5.6.2-bin.zip && \
+    unzip /tmp/gradle-5.6.2-bin.zip -d /usr/local/ && \
+    rm /tmp/gradle-5.6.2-bin.zip && \
+    mv /usr/local/gradle-5.6.2 /usr/local/gradle && \
     ln -sf /usr/local/gradle/bin/gradle /usr/local/bin/gradle
 
 # Install OpenShift clients.
 
-RUN curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v3/clients/3.10.145/linux/oc.tar.gz && \
+RUN curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v3/clients/3.10.176/linux/oc.tar.gz && \
     tar -C /usr/local/bin -zxf /tmp/oc.tar.gz oc && \
-    mv /usr/local/bin/oc /usr/local/bin/oc-3.10.145 && \
+    mv /usr/local/bin/oc /usr/local/bin/oc-3.10 && \
     rm /tmp/oc.tar.gz && \
-    curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v3/clients/3.11.115/linux/oc.tar.gz && \
+    curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v3/clients/3.11.153/linux/oc.tar.gz && \
     tar -C /usr/local/bin -zxf /tmp/oc.tar.gz oc && \
-    mv /usr/local/bin/oc /usr/local/bin/oc-3.11.115 && \
+    mv /usr/local/bin/oc /usr/local/bin/oc-3.11 && \
     rm /tmp/oc.tar.gz && \
     curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v3/clients/4.0.22/linux/oc.tar.gz && \
     tar -C /usr/local/bin -zxf /tmp/oc.tar.gz oc && \
-    mv /usr/local/bin/oc /usr/local/bin/oc-4.0.22 && \
+    mv /usr/local/bin/oc /usr/local/bin/oc-4.0 && \
     rm /tmp/oc.tar.gz && \
-    curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.1.7/openshift-client-linux-4.1.7.tar.gz && \
-    tar -C /usr/local/bin -zxf /tmp/oc.tar.gz oc kubectl && \
-    mv /usr/local/bin/oc /usr/local/bin/oc-4.1.7 && \
-    mv /usr/local/bin/kubectl /usr/local/bin/kubectl-1.13.0 && \
+    curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/oc/4.1/linux/oc.tar.gz && \
+    tar -C /usr/local/bin -zxf /tmp/oc.tar.gz oc && \
+    mv /usr/local/bin/oc /usr/local/bin/oc-4.1 && \
+    ln -s /usr/local/bin/oc-4.1 /usr/local/bin/kubectl-1.13 && \
+    rm /tmp/oc.tar.gz && \
+    curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/oc/4.2/linux/oc.tar.gz && \
+    tar -C /usr/local/bin -zxf /tmp/oc.tar.gz oc && \
+    mv /usr/local/bin/oc /usr/local/bin/oc-4.2 && \
+    ln -s /usr/local/bin/oc-4.2 /usr/local/bin/kubectl-1.14 && \
+    rm /tmp/oc.tar.gz && \
+    curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/oc/4.3/linux/oc.tar.gz && \
+    tar -C /usr/local/bin -zxf /tmp/oc.tar.gz oc && \
+    mv /usr/local/bin/oc /usr/local/bin/oc-4.3 && \
+    ln -s /usr/local/bin/oc-4.3 /usr/local/bin/kubectl-1.16 && \
     rm /tmp/oc.tar.gz
 
-RUN curl -sL -o /usr/local/bin/odo-0.0.16 https://github.com/redhat-developer/odo/releases/download/v0.0.16/odo-linux-amd64 && \
+RUN curl -sL -o /usr/local/bin/odo-0.0.16 https://github.com/openshift/odo/releases/download/v0.0.16/odo-linux-amd64 && \
     chmod +x /usr/local/bin/odo-0.0.16 && \
-    curl -sL -o /usr/local/bin/odo-0.0.17 https://github.com/redhat-developer/odo/releases/download/v0.0.17/odo-linux-amd64 && \
+    curl -sL -o /usr/local/bin/odo-0.0.17 https://github.com/openshift/odo/releases/download/v0.0.17/odo-linux-amd64 && \
     chmod +x /usr/local/bin/odo-0.0.17 && \
-    curl -sL -o /usr/local/bin/odo-0.0.18 https://github.com/redhat-developer/odo/releases/download/v0.0.18/odo-linux-amd64 && \
+    curl -sL -o /usr/local/bin/odo-0.0.18 https://github.com/openshift/odo/releases/download/v0.0.18/odo-linux-amd64 && \
     chmod +x /usr/local/bin/odo-0.0.18 && \
-    curl -sL -o /usr/local/bin/odo-0.0.19 https://github.com/redhat-developer/odo/releases/download/v0.0.19/odo-linux-amd64 && \
+    curl -sL -o /usr/local/bin/odo-0.0.19 https://github.com/openshift/odo/releases/download/v0.0.19/odo-linux-amd64 && \
     chmod +x /usr/local/bin/odo-0.0.19 && \
-    curl -sL -o /usr/local/bin/odo-0.0.20 https://github.com/redhat-developer/odo/releases/download/v0.0.20/odo-linux-amd64 && \
+    curl -sL -o /usr/local/bin/odo-0.0.20 https://github.com/openshift/odo/releases/download/v0.0.20/odo-linux-amd64 && \
     chmod +x /usr/local/bin/odo-0.0.20
 
 # Install Kubernetes client.
 
 RUN curl -sL -o /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.10.0/bin/linux/amd64/kubectl && \
-    mv /usr/local/bin/kubectl /usr/local/bin/kubectl-1.10.0 && \
-    chmod +x /usr/local/bin/kubectl-1.10.0 && \
+    mv /usr/local/bin/kubectl /usr/local/bin/kubectl-1.10 && \
+    chmod +x /usr/local/bin/kubectl-1.10 && \
     curl -sL -o /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.11.0/bin/linux/amd64/kubectl && \
-    mv /usr/local/bin/kubectl /usr/local/bin/kubectl-1.11.0 && \
-    chmod +x /usr/local/bin/kubectl-1.11.0 && \
+    mv /usr/local/bin/kubectl /usr/local/bin/kubectl-1.11 && \
+    chmod +x /usr/local/bin/kubectl-1.11 && \
     curl -sL -o /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.12.0/bin/linux/amd64/kubectl && \
-    mv /usr/local/bin/kubectl /usr/local/bin/kubectl-1.12.0 && \
-    chmod +x /usr/local/bin/kubectl-1.12.0
+    mv /usr/local/bin/kubectl /usr/local/bin/kubectl-1.12 && \
+    chmod +x /usr/local/bin/kubectl-1.12
 
 # Common environment variables.
 
