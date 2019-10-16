@@ -131,6 +131,10 @@ fi
 if [ x"$OPENSHIFT_PROJECT" != x"" ]; then
     oc project "$OPENSHIFT_PROJECT" || oc new-project "$OPENSHIFT_PROJECT" > /dev/null 2>&1
     export PROJECT_NAMESPACE=$OPENSHIFT_PROJECT
+else
+    if [ x"$PROJECT_NAMESPACE" != x"" ]; then
+        oc project "$PROJECT_NAMESPACE" > /dev/null 2>&1
+    fi
 fi
 
 # If the host used in cluster subdomain for applications is not defined
