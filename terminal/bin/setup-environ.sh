@@ -25,7 +25,13 @@ if [ x"$KUBERNETES_PORT_443_TCP_ADDR" != x"" ]; then
     oc config set-cluster local $OC_CA_ARGS --server \
         "https://$KUBERNETES_PORT_443_TCP_ADDR:$KUBERNETES_PORT_443_TCP_PORT" 
 
-    oc config set-context local --cluster local
+    CONTEXT_ARGS=
+
+    if [ x"$PROJECT_NAMESPACE" != x"" ]; then
+        CONTEXT_ARGS="--namespace=$PROJECT_NAMESPACE"
+    fi
+
+    oc config set-context local --cluster local $CONTEXT_ARGS
     oc config use-context local
 fi
 
