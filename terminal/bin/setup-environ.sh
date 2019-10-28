@@ -11,56 +11,28 @@ if [[ "$STATUS" != "0" ]]; then
     rm /tmp/passwd
 fi
 
-# Setup 'oc' client configuration for the location of the OpenShift cluster.
-
-CA_FILE="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
-
-if [ x"$KUBERNETES_PORT_443_TCP_ADDR" != x"" ]; then
-    if [ -f $CA_FILE ]; then
-        OC_CA_ARGS="--certificate-authority $CA_FILE"
-    else
-        OC_CA_ARGS="--insecure-skip-tls-verify"
-    fi
-
-    oc config set-cluster local $OC_CA_ARGS --server \
-        "https://$KUBERNETES_PORT_443_TCP_ADDR:$KUBERNETES_PORT_443_TCP_PORT" 
-
-    CONTEXT_ARGS=
-
-    if [ x"$PROJECT_NAMESPACE" != x"" ]; then
-        CONTEXT_ARGS="--namespace=$PROJECT_NAMESPACE"
-    fi
-
-    oc config set-context local --cluster local $CONTEXT_ARGS
-    oc config use-context local
-fi
-
 # Try and work out the correct version of the command line tools to use
-# if not explicitly defined by the template. This assumes you will be
-# using the same cluster the deployment is to. We hope the above setup
-# will work okay with the default 'oc' version if no version was defined
-# and before we can work out the correct version to use.
+# if not explicitly specified in environment. This assumes you will be
+# using the same cluster the deployment is to.
 
-if [ x"$KUBERNETES_PORT_443_TCP_ADDR" != x"" ]; then
+KUBERNETES_SERVER=$KUBERNETES_PORT_443_TCP_ADDR:$KUBERNETES_PORT_443_TCP_PORT
+
+if [ x"$KUBERNETES_SERVER" != x":" ]; then
     if [ -z "$KUBECTL_VERSION" ]; then
-        KUBECTL_VERSION=`(/usr/local/bin/kubectl-1.11.0 version -o json | \
+        KUBECTL_VERSION=`(curl -s -k https://$KUBERNETES_SERVER/version | \
             python -c 'from __future__ import print_function; import sys, json; \
-            info = json.loads(sys.stdin.read()).get("serverVersion"); \
+            info = json.loads(sys.stdin.read()); \
             info and print("%s.%s" % (info["major"], info["minor"]))') || true`
     fi
 fi
-
-OPENSHIFT_IMAGE_REGISTRY="image-registry.openshift-image-registry.svc:5000"
 
 if [ -z "$OC_VERSION" ]; then
     case "$KUBECTL_VERSION" in
         1.10|1.10+)
             OC_VERSION=3.10
-            OPENSHIFT_IMAGE_REGISTRY="docker-registry.default.svc:5000"
             ;;
         1.11|1.11+)
             OC_VERSION=3.11
-            OPENSHIFT_IMAGE_REGISTRY="docker-registry.default.svc:5000"
             ;;
         1.12|1.12+)
             OC_VERSION=4.0
@@ -70,6 +42,9 @@ if [ -z "$OC_VERSION" ]; then
             ;;
         1.14|1.14+)
             OC_VERSION=4.2
+            ;;
+        1.15|1.15+)
+            OC_VERSION=4.3
             ;;
         1.16|1.16+)
             OC_VERSION=4.3
@@ -85,7 +60,28 @@ export OC_VERSION
 export KUBECTL_VERSION
 export ODO_VERSION
 
-export OPENSHIFT_IMAGE_REGISTRY
+# Setup 'oc' client configuration for the location of the OpenShift cluster.
+
+CA_FILE="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+
+if [ x"$KUBERNETES_SERVER" != x":" ]; then
+    if [ -f $CA_FILE ]; then
+        KUBECTL_CA_ARGS="--certificate-authority $CA_FILE"
+    else
+        KUBECTL_CA_ARGS="--insecure-skip-tls-verify"
+    fi
+
+    kubectl config set-cluster local $KUBECTL_CA_ARGS --server "https://$KUBERNETES_SERVER" 
+
+    CONTEXT_ARGS=
+
+    if [ x"$PROJECT_NAMESPACE" != x"" ]; then
+        CONTEXT_ARGS="--namespace=$PROJECT_NAMESPACE"
+    fi
+
+    kubectl config set-context local --cluster local $CONTEXT_ARGS
+    kubectl config use-context local
+fi
 
 # Now attempt to login to the OpenShift cluster. First check whether we
 # inherited a user access token from shared directory volume initialised
@@ -98,25 +94,25 @@ TOKEN_DIRECTORY="/var/run/workshop"
 USER_TOKEN_FILE="$TOKEN_DIRECTORY/token"
 ACCT_TOKEN_FILE="/var/run/secrets/kubernetes.io/serviceaccount/token"
 
-if [ x"$KUBERNETES_PORT_443_TCP_ADDR" != x"" ]; then
+if [ x"$KUBERNETES_SERVER" != x":" ]; then
     if [ -f $USER_TOKEN_FILE ]; then
-        oc login $OC_CA_ARGS --token `cat $USER_TOKEN_FILE` > /dev/null 2>&1
+        oc login $KUBECTL_CA_ARGS --token `cat $USER_TOKEN_FILE` > /dev/null 2>&1
     else
         if [ x"$OPENSHIFT_TOKEN" != x"" ]; then
-            oc login $OC_CA_ARGS --token "$OPENSHIFT_TOKEN" > /dev/null 2>&1
+            oc login $KUBECTL_CA_ARGS --token "$OPENSHIFT_TOKEN" > /dev/null 2>&1
             if [ -d $TOKEN_DIRECTORY ]; then
                 echo "$OPENSHIFT_TOKEN" > $USER_TOKEN_FILE.$$
                 mv $USER_TOKEN_FILE.$$ $USER_TOKEN_FILE
             fi
         else
             if [ x"$OPENSHIFT_USERNAME" != x"" -a x"$OPENSHIFT_PASSWORD" != x"" ]; then
-                oc login $OC_CA_ARGS -u "$OPENSHIFT_USERNAME" -p "$OPENSHIFT_PASSWORD" > /dev/null 2>&1
+                oc login $KUBECTL_CA_ARGS -u "$OPENSHIFT_USERNAME" -p "$OPENSHIFT_PASSWORD" > /dev/null 2>&1
                 if [ -d $TOKEN_DIRECTORY ]; then
                     oc whoami --show-token > $USER_TOKEN_FILE
                 fi
             else
                 if [ -f $ACCT_TOKEN_FILE ]; then
-                    oc login $OC_CA_ARGS --token `cat $ACCT_TOKEN_FILE` > /dev/null 2>&1
+                    oc login $KUBECTL_CA_ARGS --token `cat $ACCT_TOKEN_FILE` > /dev/null 2>&1
                 fi
             fi
         fi
@@ -135,6 +131,20 @@ else
     if [ x"$PROJECT_NAMESPACE" != x"" ]; then
         oc project "$PROJECT_NAMESPACE" > /dev/null 2>&1
     fi
+fi
+
+# Calculate the address for the internal OpenShift image registry.
+
+if [ x"$OPENSHIFT_IMAGE_REGISTRY" = x"" ]; then
+    OPENSHIFT_IMAGE_REGISTRY="image-registry.openshift-image-registry.svc:5000"
+
+    case "$KUBECTL_VERSION" in
+        1.10|1.10+|1.11|1.11+)
+            OPENSHIFT_IMAGE_REGISTRY="docker-registry.default.svc:5000"
+            ;;
+    esac
+
+    export OPENSHIFT_IMAGE_REGISTRY
 fi
 
 # If the host used in cluster subdomain for applications is not defined
