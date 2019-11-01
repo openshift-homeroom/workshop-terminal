@@ -91,7 +91,7 @@ Alternatively, if you have uploaded the custom terminal image to an accessible i
 
 ```
 $ oc new-app https://raw.githubusercontent.com/openshift-homeroom/workshop-terminal/master/templates/production.json \
-  --param APPLICATION_NAME=myterminal \
+  --param SESSION_NAME=myterminal \
   --param TERMINAL_IMAGE=quay.io/yourusername/youimagename:latest
 ```
 

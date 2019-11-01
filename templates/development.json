@@ -9,9 +9,14 @@
     },
     "parameters": [
         {
-            "name": "APPLICATION_NAME",
+            "name": "SESSION_NAME",
             "value": "terminal",
             "required": true
+        },
+        {
+            "name": "NAME_PREFIX",
+            "value": "",
+            "required": false
         },
         {
             "name": "AUTH_USERNAME",
@@ -56,12 +61,12 @@
             "kind": "ServiceAccount",
             "apiVersion": "v1",
             "metadata": {
-                "name": "${APPLICATION_NAME}-user",
+                "name": "${NAME_PREFIX}${SESSION_NAME}-user",
                 "labels": {
-                    "app": "${APPLICATION_NAME}"
+                    "app": "${NAME_PREFIX}${SESSION_NAME}"
                 },
                 "annotations": {
-                    "serviceaccounts.openshift.io/oauth-redirectreference.first": "{\"kind\":\"OAuthRedirectReference\",\"apiVersion\":\"v1\",\"reference\":{\"kind\":\"Route\",\"name\":\"${APPLICATION_NAME}\"}}",
+                    "serviceaccounts.openshift.io/oauth-redirectreference.first": "{\"kind\":\"OAuthRedirectReference\",\"apiVersion\":\"v1\",\"reference\":{\"kind\":\"Route\",\"name\":\"${NAME_PREFIX}${SESSION_NAME}\"}}",
                     "serviceaccounts.openshift.io/oauth-redirecturi.first": "oauth_callback",
                     "serviceaccounts.openshift.io/oauth-want-challenges": "false"
                 }
@@ -71,15 +76,15 @@
             "kind": "RoleBinding",
             "apiVersion": "v1",
             "metadata": {
-                "name": "${APPLICATION_NAME}-admin",
+                "name": "${NAME_PREFIX}${SESSION_NAME}-admin",
                 "labels": {
-                    "app": "${APPLICATION_NAME}"
+                    "app": "${NAME_PREFIX}${SESSION_NAME}"
                 }
             },
             "subjects": [
                 {
                     "kind": "ServiceAccount",
-                    "name": "${APPLICATION_NAME}-user"
+                    "name": "${NAME_PREFIX}${SESSION_NAME}-user"
                 }
             ],
             "roleRef": {
@@ -90,9 +95,9 @@
             "kind": "ImageStream",
             "apiVersion": "v1",
             "metadata": {
-                "name": "${APPLICATION_NAME}",
+                "name": "${NAME_PREFIX}${SESSION_NAME}",
                 "labels": {
-                    "app": "${APPLICATION_NAME}"
+                    "app": "${NAME_PREFIX}${SESSION_NAME}"
                 }
             },
             "spec": {
@@ -105,9 +110,9 @@
             "kind": "BuildConfig",
             "apiVersion": "v1",
             "metadata": {
-                "name": "${APPLICATION_NAME}",
+                "name": "${NAME_PREFIX}${SESSION_NAME}",
                 "labels": {
-                    "app": "${APPLICATION_NAME}"
+                    "app": "${NAME_PREFIX}${SESSION_NAME}"
                 }
             },
             "spec": {
@@ -139,7 +144,7 @@
                 "output": {
                     "to": {
                         "kind": "ImageStreamTag",
-                        "name": "${APPLICATION_NAME}:latest"
+                        "name": "${NAME_PREFIX}${SESSION_NAME}:latest"
                     }
                 }
             }
@@ -148,9 +153,9 @@
             "kind": "ConfigMap",
             "apiVersion": "v1",
             "metadata": {
-                "name": "${APPLICATION_NAME}-env",
+                "name": "${NAME_PREFIX}${SESSION_NAME}-env",
                 "labels": {
-                    "app": "${APPLICATION_NAME}"
+                    "app": "${NAME_PREFIX}${SESSION_NAME}"
                 }
             },
             "data": {
@@ -161,9 +166,9 @@
             "kind": "DeploymentConfig",
             "apiVersion": "v1",
             "metadata": {
-                "name": "${APPLICATION_NAME}",
+                "name": "${NAME_PREFIX}${SESSION_NAME}",
                 "labels": {
-                    "app": "${APPLICATION_NAME}"
+                    "app": "${NAME_PREFIX}${SESSION_NAME}"
                 }
             },
             "spec": {
@@ -183,25 +188,25 @@
                             ],
                             "from": {
                                 "kind": "ImageStreamTag",
-                                "name": "${APPLICATION_NAME}:latest"
+                                "name": "${NAME_PREFIX}${SESSION_NAME}:latest"
                             }
                         }
                     }
                 ],
                 "replicas": 1,
                 "selector": {
-                    "app": "${APPLICATION_NAME}",
-                    "deploymentconfig": "${APPLICATION_NAME}"
+                    "app": "${NAME_PREFIX}${SESSION_NAME}",
+                    "deploymentconfig": "${NAME_PREFIX}${SESSION_NAME}"
                 },
                 "template": {
                     "metadata": {
                         "labels": {
-                            "app": "${APPLICATION_NAME}",
-                            "deploymentconfig": "${APPLICATION_NAME}"
+                            "app": "${NAME_PREFIX}${SESSION_NAME}",
+                            "deploymentconfig": "${NAME_PREFIX}${SESSION_NAME}"
                         }
                     },
                     "spec": {
-                        "serviceAccountName": "${APPLICATION_NAME}-user",
+                        "serviceAccountName": "${NAME_PREFIX}${SESSION_NAME}-user",
                         "containers": [
                             {
                                 "name": "terminal",
@@ -214,7 +219,7 @@
                                 "env": [
                                     {
                                         "name": "APPLICATION_NAME",
-                                        "value": "${APPLICATION_NAME}"
+                                        "value": "${NAME_PREFIX}${SESSION_NAME}"
                                     },
                                     {
                                         "name": "AUTH_USERNAME",
@@ -226,7 +231,7 @@
                                     },
                                     {
                                         "name": "OAUTH_SERVICE_ACCOUNT",
-                                        "value": "${APPLICATION_NAME}-user"
+                                        "value": "${NAME_PREFIX}${SESSION_NAME}-user"
                                     },
                                     {
                                         "name": "OPENSHIFT_USERNAME",
@@ -253,7 +258,7 @@
                             {
                                 "name": "envvars",
                                 "configMap": {
-                                    "name": "${APPLICATION_NAME}-env",
+                                    "name": "${NAME_PREFIX}${SESSION_NAME}-env",
                                     "defaultMode": 420
                                 }
                             }
@@ -266,9 +271,9 @@
             "kind": "Service",
             "apiVersion": "v1",
             "metadata": {
-                "name": "${APPLICATION_NAME}",
+                "name": "${NAME_PREFIX}${SESSION_NAME}",
                 "labels": {
-                    "app": "${APPLICATION_NAME}"
+                    "app": "${NAME_PREFIX}${SESSION_NAME}"
                 }
             },
             "spec": {
@@ -281,8 +286,8 @@
                     }
                 ],
                 "selector": {
-                    "app": "${APPLICATION_NAME}",
-                    "deploymentconfig": "${APPLICATION_NAME}"
+                    "app": "${NAME_PREFIX}${SESSION_NAME}",
+                    "deploymentconfig": "${NAME_PREFIX}${SESSION_NAME}"
                 }
             }
         },
@@ -290,16 +295,16 @@
             "kind": "Route",
             "apiVersion": "v1",
             "metadata": {
-                "name": "${APPLICATION_NAME}",
+                "name": "${NAME_PREFIX}${SESSION_NAME}",
                 "labels": {
-                    "app": "${APPLICATION_NAME}"
+                    "app": "${NAME_PREFIX}${SESSION_NAME}"
                 }
             },
             "spec": {
                 "host": "",
                 "to": {
                     "kind": "Service",
-                    "name": "${APPLICATION_NAME}",
+                    "name": "${NAME_PREFIX}${SESSION_NAME}",
                     "weight": 100
                 },
                 "port": {
