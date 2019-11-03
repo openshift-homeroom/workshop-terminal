@@ -129,7 +129,7 @@ if [ x"$OPENSHIFT_PROJECT" != x"" ]; then
     export PROJECT_NAMESPACE=$OPENSHIFT_PROJECT
 else
     if [ x"$PROJECT_NAMESPACE" != x"" ]; then
-        oc project "$PROJECT_NAMESPACE" > /dev/null 2>&1
+        oc project "$PROJECT_NAMESPACE" || true > /dev/null 2>&1
     fi
 fi
 
