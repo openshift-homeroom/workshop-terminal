@@ -19,8 +19,14 @@ case $KUBECTL_VERSION in
     1.16|1.16+|1.16.*)
         KUBECTL_VERSION=1.16
         ;;
+    1.17|1.17+|1.17.*)
+        KUBECTL_VERSION=1.17
+        ;;
+    1.18|1.18+|1.18.*)
+        KUBECTL_VERSION=1.18
+        ;;
     *)
-        KUBECTL_VERSION=1.16
+        KUBECTL_VERSION=1.18
         ;;
 esac
 

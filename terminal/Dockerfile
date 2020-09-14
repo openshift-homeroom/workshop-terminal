@@ -36,16 +36,16 @@ RUN HOME=/root && \
     yum -y clean all --enablerepo='*'
 
 RUN HOME=/root && \
-    (curl -s -0 http://www.us.apache.org/dist/maven/maven-3/3.6.2/binaries/apache-maven-3.6.2-bin.tar.gz | \
+    (curl -s -0 https://downloads.apache.org/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz | \
     tar -zx -C /usr/local) && \
-    mv /usr/local/apache-maven-3.6.2 /usr/local/maven && \
+    mv /usr/local/apache-maven-3.6.3 /usr/local/maven && \
     ln -sf /usr/local/maven/bin/mvn /usr/local/bin/mvn
 
 RUN HOME=/root && \
-    curl -sL -0 https://services.gradle.org/distributions/gradle-5.6.2-bin.zip -o /tmp/gradle-5.6.2-bin.zip && \
-    unzip /tmp/gradle-5.6.2-bin.zip -d /usr/local/ && \
-    rm /tmp/gradle-5.6.2-bin.zip && \
-    mv /usr/local/gradle-5.6.2 /usr/local/gradle && \
+    curl -sL -0 https://services.gradle.org/distributions/gradle-6.6.1-bin.zip -o /tmp/gradle-6.6.1-bin.zip && \
+    unzip /tmp/gradle-6.6.1-bin.zip -d /usr/local/ && \
+    rm /tmp/gradle-6.6.1-bin.zip && \
+    mv /usr/local/gradle-6.6.1 /usr/local/gradle && \
     ln -sf /usr/local/gradle/bin/gradle /usr/local/bin/gradle
 
 # Install OpenShift clients.
@@ -57,10 +57,6 @@ RUN curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v3/clie
     curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v3/clients/3.11.153/linux/oc.tar.gz && \
     tar -C /usr/local/bin -zxf /tmp/oc.tar.gz oc && \
     mv /usr/local/bin/oc /usr/local/bin/oc-3.11 && \
-    rm /tmp/oc.tar.gz && \
-    curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v3/clients/4.0.22/linux/oc.tar.gz && \
-    tar -C /usr/local/bin -zxf /tmp/oc.tar.gz oc && \
-    mv /usr/local/bin/oc /usr/local/bin/oc-4.0 && \
     rm /tmp/oc.tar.gz && \
     curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/oc/4.1/linux/oc.tar.gz && \
     tar -C /usr/local/bin -zxf /tmp/oc.tar.gz oc && \
@@ -76,6 +72,21 @@ RUN curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v3/clie
     tar -C /usr/local/bin -zxf /tmp/oc.tar.gz oc && \
     mv /usr/local/bin/oc /usr/local/bin/oc-4.3 && \
     ln -s /usr/local/bin/oc-4.3 /usr/local/bin/kubectl-1.16 && \
+    rm /tmp/oc.tar.gz && \
+    curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/oc/4.4/linux/oc.tar.gz && \
+    tar -C /usr/local/bin -zxf /tmp/oc.tar.gz oc && \
+    mv /usr/local/bin/oc /usr/local/bin/oc-4.4 && \
+    ln -s /usr/local/bin/oc-4.4 /usr/local/bin/kubectl-1.17 && \
+    rm /tmp/oc.tar.gz && \
+    curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/oc/4.5/linux/oc.tar.gz && \
+    tar -C /usr/local/bin -zxf /tmp/oc.tar.gz oc && \
+    mv /usr/local/bin/oc /usr/local/bin/oc-4.5 && \
+    ln -s /usr/local/bin/oc-4.5 /usr/local/bin/kubectl-1.18 && \
+    rm /tmp/oc.tar.gz && \
+    curl -s -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/oc/4.6/linux/oc.tar.gz && \
+    tar -C /usr/local/bin -zxf /tmp/oc.tar.gz oc && \
+    mv /usr/local/bin/oc /usr/local/bin/oc-4.6 && \
+    #ln -s /usr/local/bin/oc-4.6 /usr/local/bin/kubectl-1.16 && \ # 4.6 still TBD, but the tool is available
     rm /tmp/oc.tar.gz
 
 RUN curl -sL -o /usr/local/bin/odo-0.0.16 https://github.com/openshift/odo/releases/download/v0.0.16/odo-linux-amd64 && \
@@ -92,6 +103,10 @@ RUN curl -sL -o /usr/local/bin/odo-0.0.16 https://github.com/openshift/odo/relea
     tar -C /tmp -xf /tmp/odo.tar.gz && \
     mv /tmp/odo /usr/local/bin/odo-1.0 && \
     chmod +x /usr/local/bin/odo-1.0 && \
+    curl -sL -o /tmp/odo.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/odo/v1.2.6/odo-linux-amd64.tar.gz && \
+    tar -C /tmp -xf /tmp/odo.tar.gz && \
+    mv /tmp/odo /usr/local/bin/odo-1.2.6 && \
+    chmod +x /usr/local/bin/odo-1.2.6 && \
     rm /tmp/odo.tar.gz
 
 # Install Kubernetes client.
